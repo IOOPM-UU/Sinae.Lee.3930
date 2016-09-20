@@ -32,7 +32,9 @@ struct node  *node_new(void *element, struct node *next)
   
   struct node *n = malloc(sizeof(struct node));
   if (n == NULL)
+  {
     return NULL;
+  }
   n->elem = element;
   n->next = next;      
   return n;
