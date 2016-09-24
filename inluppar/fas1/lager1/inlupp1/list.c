@@ -78,6 +78,15 @@ void list_prepend(list_t *list, void *elem)
     }
 }
 
+int positive_index (int length, int index) // not in file.h yet
+{
+  int pos_i = length + 1 + index;
+  while (pos_i < 0)
+    {
+      pos_i = length + 1 + pos_i;
+    }
+  return pos_i;
+}
 
 bool list_insert(list_t *list, int index, void *elem)
 {
@@ -124,7 +133,7 @@ bool list_insert(list_t *list, int index, void *elem)
 
   if(index < 0)
     {
-      pos_i = length + 1 + index;
+      pos_i = positive_index(length, index);
       value = list_insert(list, pos_i, elem);
       return value;
     }
@@ -138,7 +147,6 @@ bool list_insert(list_t *list, int index, void *elem)
 
 
 bool list_remove(list_t *list, int index, void *elem);
-
 
 void *list_get(list_t *list, int index)
 {
@@ -165,14 +173,6 @@ void *list_get(list_t *list, int index)
       count++;
     }
   return current->value;
-  /*
-  if(index < 0 && index < length)
-    {
-      int pos_i = length + 1 + index;
-      void *elem = list_get(list, pos_i);
-      return elem;
-    }
-  */
 }
 
 void *list_first(list_t *list)
@@ -235,7 +235,7 @@ int list_length(list_t *list)
 int main()
 {
   list_t *list = list_new();
-  
+ 
   char *string = strdup("Aha");
 
   list_append(list, string);
@@ -245,7 +245,7 @@ int main()
   printf("%s\n", get);
 
  // free(string);
- 
+  
 
   int *i0 = calloc(1, sizeof(int));
   *i0 = 2;
@@ -261,6 +261,24 @@ int main()
   bool tellme = list_insert(list, -1, i2);
   printf("insert true if 1 =  %d\n", tellme); //prints 1 if ture
 
+  int *insert = calloc(1, sizeof(int));
+  *insert = 3;
+                       
+  bool value = list_insert(list, 0, insert);
+  printf("insert true if 1 = %d\n", value);
+
+  int *insert1 = calloc(1, sizeof(int));
+  *insert1 = 4;
+                       
+  bool value1 = list_insert(list, 1, insert1);
+  printf("insert true if 1 = %d\n", value1);
+
+  int *insert2 = calloc(1, sizeof(int));
+  *insert2 = 98;
+                       
+  bool value2 = list_insert(list, 5, insert2);
+  printf("insert true if 1 = %d\n", value2);
+  
   int *i3 = calloc(1, sizeof(int));
   *i3 = 5;
   list_append(list, i3);
@@ -273,7 +291,12 @@ int main()
   *i5 = 1;
   list_prepend(list, i5);
 
-  // våran list = [1, 2, Aha,  10, 11, 5, 7]
+  int *i6 = calloc(1, sizeof(int));
+  *i6 = 0;
+  bool answer = list_insert(list, -5, i6);
+  printf("insert true if 1 = %d\n", answer);
+
+  // våran list = [1, 3, 4, 2, Aha,  10, 0, 11, 5, 7]
   
   int *r0 = list_get(list, 0);
   printf("%d\n", *r0);
@@ -296,12 +319,29 @@ int main()
   int *r6 = list_get(list, 6);
   printf("%d\n", *r6);
 
-  printf("listan ska vara 1, 2, weird number for string Aha, 10, 11, 5, 7\n");
+  int *r7 = list_get(list, 7);
+  printf("%d\n", *r7);
+
+  int *r8 = list_get(list, 8);
+  printf("%d\n", *r8);
+
+  int *r9 = list_get(list, 9);
+  printf("%d\n", *r9);
+
+  int *r10 = list_get(list, 10);
+  printf("%d\n", *r10);
+
+  
+
+  
+  
+
+  printf("listan ska vara 1, 3, 4, 2,  weird number for string Aha, 10, 0, 98, 11, 5, 7\n");
   
   
   int size;
   size = list_length(list);
-  printf("length är 7. return %d\n", size);
+  printf("length är 11. return %d\n", size);
 
   
   
