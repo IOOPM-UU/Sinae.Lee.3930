@@ -1,5 +1,6 @@
 # include "list.h"
 
+
 typedef struct node node_t;
 
 struct node
@@ -36,6 +37,7 @@ void node_free(node_t *node)
   free(node);
 }
 
+
 list_t *list_new()
 {
   list_t *empty_list = calloc(1, sizeof(list_t)); 
@@ -46,7 +48,7 @@ list_t *list_new()
   return empty_list;
 }
 
-
+void list_free(list_t *list);
 
 void list_append(list_t *list, void *elem)
 {
@@ -144,9 +146,72 @@ bool list_insert(list_t *list, int index, void *elem)
     }
 }
 
+/// Example: (assume l == [43, 44, 42, 45])
+///
+/// int elem;
+/// list_remove(l, 1, &elem);  // l = [43, 42, 45], elem == 44
+/// list_remove(l, -1, &elem); // l = [43, 42], elem == 45
+/// \param elem a pointer to where the element can be stored
+
+bool list_remove(list_t *list, int index, void *elem)
+{
+  int length = list_length(list);
+  int pos_i;
+  node_t *temp;
+  
+  if(list->first == NULL)
+    {
+      printf("list is empty\n");
+      return true;
+    }
+
+  if(index >= length)
+    {
+      printf("Error, index is greater than length of list\n");
+      return false;
+    }
+
+  if (index < 0)
+    {
+      pos_i = length + 1 + index;
+      bool is_true = list_remove(list, pos_i, elem);
+      return is_true;
+    }
+
+  //http://quiz.geeksforgeeks.org/delete-a-linked-list-node-at-a-given-position/
+  temp = list->first;
+  if (index == 0)   //deleting first node
+    {
+      list->first = temp->next;
+      elem = temp->value;
+      node_free(temp);
+      return true;
+    }
+  
+  for (int i=0; temp !=NULL && i<index-1; i++)
+    {
+      temp = temp->next;
+    }
+  node_t *next = temp->next->next;
+  elem = temp->next->value;
+  node_free(temp->next);
+  temp->next = next;
+  return true;
+}
 
 
-bool list_remove(list_t *list, int index, void *elem);
+void list_free(list_t *list)
+{
+  node_t *current = list->first;
+  node_t *prev = current;
+  while(current != NULL)
+    {
+      current = current->next;
+      node_free(prev);
+      prev = current;
+    }
+  free(list);
+}
 
 void *list_get(list_t *list, int index)
 {
@@ -164,7 +229,8 @@ void *list_get(list_t *list, int index)
       return list_last(list);
     }
 
-  while(current != NULL)
+//http://www.geeksforgeeks.org/write-a-function-to-get-nth-node-in-a-linked-list/
+  while(current != NULL)   
     {
       if (count == index)
         return current->value;
@@ -227,15 +293,21 @@ int list_length(list_t *list)
 }
 
 
-
-
-
- 
+void print_list(list_t *list)
+{
+  node_t *current = list->first;
+  
+  while (current != NULL)
+    {
+      printf("each element: %d\n", *(int *)current->value);
+      current = current->next;
+    }
+}
 
 int main()
 {
   list_t *list = list_new();
- 
+  /*
   char *string = strdup("Aha");
 
   list_append(list, string);
@@ -244,8 +316,7 @@ int main()
 
   printf("%s\n", get);
 
- // free(string);
-  
+  */
 
   int *i0 = calloc(1, sizeof(int));
   *i0 = 2;
@@ -255,29 +326,29 @@ int main()
   *i1 = 10;
   list_append(list, i1);
 
-  int *i2 = calloc(1, sizeof(int));
-  *i2 = 11;
+  //  int *i2 = calloc(1, sizeof(int));
+  //*i2 = 11;
 
-  bool tellme = list_insert(list, -1, i2);
-  printf("insert true if 1 =  %d\n", tellme); //prints 1 if ture
+  // bool tellme = list_insert(list, -1, i2);
+  //printf("insert true if 1 =  %d\n", tellme); //prints 1 if ture
 
-  int *insert = calloc(1, sizeof(int));
-  *insert = 3;
+  // int *insert = calloc(1, sizeof(int));
+  //*insert = 3;
                        
-  bool value = list_insert(list, 0, insert);
-  printf("insert true if 1 = %d\n", value);
+  // bool value = list_insert(list, 0, insert);
+  //printf("insert true if 1 = %d\n", value);
 
-  int *insert1 = calloc(1, sizeof(int));
-  *insert1 = 4;
+  // int *insert1 = calloc(1, sizeof(int));
+  // *insert1 = 4;
                        
-  bool value1 = list_insert(list, 1, insert1);
-  printf("insert true if 1 = %d\n", value1);
+  // bool value1 = list_insert(list, 1, insert1);
+  //printf("insert true if 1 = %d\n", value1);
 
-  int *insert2 = calloc(1, sizeof(int));
-  *insert2 = 98;
+  // int *insert2 = calloc(1, sizeof(int));
+  //*insert2 = 98;
                        
-  bool value2 = list_insert(list, 5, insert2);
-  printf("insert true if 1 = %d\n", value2);
+  // bool value2 = list_insert(list, 5, insert2);
+  //printf("insert true if 1 = %d\n", value2);
   
   int *i3 = calloc(1, sizeof(int));
   *i3 = 5;
@@ -291,13 +362,11 @@ int main()
   *i5 = 1;
   list_prepend(list, i5);
 
-  int *i6 = calloc(1, sizeof(int));
-  *i6 = 0;
-  bool answer = list_insert(list, -5, i6);
-  printf("insert true if 1 = %d\n", answer);
-
-  // våran list = [1, 3, 4, 2, Aha,  10, 0, 11, 5, 7]
-  
+  // int *i6 = calloc(1, sizeof(int));
+  //*i6 = 0;
+  //bool answer = list_insert(list, -5, i6);
+  //printf("insert true if 1 = %d\n", answer);
+ 
   int *r0 = list_get(list, 0);
   printf("%d\n", *r0);
 
@@ -313,40 +382,50 @@ int main()
   int *r4 = list_get(list, 4);
   printf("%d\n", *r4);
 
-  int *r5 = list_get(list, 5);
-  printf("%d\n", *r5);
+  // int *r5 = list_get(list, 5);
+  // printf("%d\n", *r5);
 
-  int *r6 = list_get(list, 6);
-  printf("%d\n", *r6);
+  //int *r6 = list_get(list, 6);
+  // printf("%d\n", *r6);
 
-  int *r7 = list_get(list, 7);
-  printf("%d\n", *r7);
+  //int *r7 = list_get(list, 7);
+  //printf("%d\n", *r7);
 
-  int *r8 = list_get(list, 8);
-  printf("%d\n", *r8);
+  //  int *r8 = list_get(list, 8);
+  // printf("%d\n", *r8);
 
-  int *r9 = list_get(list, 9);
-  printf("%d\n", *r9);
+  //int *r9 = list_get(list, 9);
+  // printf("%d\n", *r9);
 
-  int *r10 = list_get(list, 10);
-  printf("%d\n", *r10);
-
-  
+ 
 
   
+
+  
   
 
-  printf("listan ska vara 1, 3, 4, 2,  weird number for string Aha, 10, 0, 98, 11, 5, 7\n");
+  printf("listan ska vara 1, 2, 10, 5, 7\n");
   
   
   int size;
   size = list_length(list);
-  printf("length är 11. return %d\n", size);
+  printf("length är %d\n", size);
+
+  void *elem;
+  list_remove(list, -2, &elem);
+  list_remove(list, 1, &elem);
+  list_remove(list, 2, &elem);
+  list_remove(list, 0, &elem);
+  
+  print_list(list);
+   
+  
+  list_free(list);
+
+
 
   
-  
 
-  
   
   return 0;
 }
