@@ -1,4 +1,6 @@
-#include "tree.h"
+# include <stdlib.h>
+# include <stdbool.h>
+# include "tree.h"
 
 // nycklarna i sökträdet är varunamn
 //Varor med samma namn anses vara identiska
@@ -15,7 +17,7 @@ struct tree{
 
 struct node{
   char *key;
-  void *data;
+  void *data;  //info
   node_t *left;
   node_t *right;
 };
@@ -31,12 +33,25 @@ struct node{
 /// Creates a new tree
 ///
 /// \returns: empty tree
-tree_t *tree_new();
+tree_t *tree_new()
+{
+  tree_t *tree = calloc(1, sizeof(tree_t));
+  if (tree == NULL)
+    return NULL;
+  tree->root = NULL;
+  return tree;
+}
 
 
-
-node_t *new_node(char *key, void *data);
-
+// create a new node
+node_t *new_node(char *key, void *data)
+{
+  node_t *node = calloc(1, sizeof(node_t));
+  node->key = key;
+  node->data = data;
+  node->left = node->right = NULL;
+  return node;
+}
 
 
 /// Get the size of the tree 
