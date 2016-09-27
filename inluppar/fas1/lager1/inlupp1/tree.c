@@ -33,6 +33,17 @@ struct node{
 /// \bug This file is partial. (On purpose.)
 
 
+
+// create a new node
+node_t *new_node(char *key, void *data)
+{
+  node_t *node = calloc(1, sizeof(node_t));
+  node->key = key;
+  node->data = data;
+  node->left = node->right = NULL;
+  return node;
+}
+
 /// Creates a new tree
 ///
 /// \returns: empty tree
@@ -45,27 +56,18 @@ tree_t *tree_new()
   return tree;
 }
 
-
-// create a new node
-node_t *new_node(char *key, void *data)
-{
-  node_t *node = calloc(1, sizeof(node_t));
-  node->key = key;
-  node->data = data;
-  node->left = node->right = NULL;
-  return node;
-}
-
 int node_size(node_t *root)
 {
   int size = 0;
-  if (root)
+  if (root == NULL)
     {
-      size++;
-      size = size + node_size(root->left);
-      size = size + node_size(root->right);
+      return 0;
     }
 
+  else // root != NULL
+    {
+      size = node_size(root->left) + 1 + node_size(root->right); 
+    }
   return size;
 }
 /// Get the size of the tree 
@@ -115,20 +117,103 @@ int tree_depth(tree_t *tree)
 }
 
 
-
-//TODO tree_insert(tree_t *tree, TODO);
-/*
-tree_t *tree_insert(tree_t *tree, char *key, void *data)
+// https://www.tutorialspoint.com/c_standard_library/c_function_strcmp.htm
+// http://stackoverflow.com/questions/19724546/creating-a-binary-search-tree-with-strings
+//http://quiz.geeksforgeeks.org/binary-search-tree-set-1-search-and-insertion/
+bool insert_node (node_t *node, char *key, void *data)
 {
-  if (tree->root != NULL)
+  int ret; //return value
+  ret = strcmp(key, node->key);
+  
+  // if the tree is empty, return a new node
+
+  /*if (node == NULL) 
     {
-      
+      new_node(key, data);
+    }
+  */
+  
+  // key < node->key
+  if (ret < 0)
+    {
+      if (node->left != NULL)
+        {
+          insert_node (node->left, key, data);
+          return true;
+        }
+
+      else // node->left == NULL
+        {
+          node->left = new_node(key, data);
+          return true;
+        }
     }
 
-  else //tree->root == NULL
-    return tree_insert(tree->root, new_node(key, data));
+  // key > node->key
+  else if (ret > 0)
+    {
+      if (node->right != NULL)
+        {
+          insert_node (node->right, key, data);
+          return true;
+        }
+
+      else  // node->right == NULL
+        {
+          new_node(key, data);
+          return true;
+        }
+    }
+  
+  else
+
+    return false;
 }
-*/
+
+//TODO tree_insert(tree_t *tree, TODO);
+
+tree_t *tree_insert(tree_t *tree, char *key, void *data)
+{
+  //subtree_insert(tree->root, key, data);
+
+  if (tree->root == NULL)
+    {
+      tree->root = new_node(key, data);
+      return true;
+    }
+
+  else if (tree->root != NULL)
+    {
+      insert_node(tree->root, key, data);
+      return true;
+    }
+  
+  else
+    return false;
+}
+
+char *get_node_key(node_t *node)
+{
+  if (node != NULL)
+    {
+      return node->key;
+    }
+
+  else  // there is no node;
+    return NULL;
+}
+
+void print_tree(tree_t *tree)
+{
+  node_t *current = tree->root;
+  while (current != NULL)
+    {
+      printf("tree : %s\n", current->key);
+      current = curr
+    }
+}
+
+
 /// This does not need implementation until Assignment 2
 //TODO tree_remove(tree_t *tree, TODO);
 
@@ -137,49 +222,33 @@ tree_t *tree_insert(tree_t *tree, char *key, void *data)
 
  int main()
  {
-   char *c1 = calloc(1, sizeof(char));
-   *c1 = 'c';
 
-   int *i1 = calloc(1, sizeof(int));
-   *i1 = 1;
+   tree_t *tree1;
+   tree1 = tree_new();
+
+   //int *i1 = calloc(1, sizeof(int));
+   // *i1 = 10;
+
+   bool value1 = tree_insert(tree1, "kola", (int *)10);
+   printf("if true return %d\n", value1);
+
+
+   tree_t *tree2 = tree_new();
+  
+
    
-   node_t *root = new_node(c1, i1);
 
-   char *c2 = calloc(1, sizeof(char));
-   *c1 = 'b';
-
-   int *i2 = calloc(1, sizeof(int));
-   *i2 = 2;
-   root->left = new_node(c2, i2);
-
-   char *c3 = calloc(1, sizeof(char));
-   *c3 = 'd';
-
-   int *i3 = calloc(1, sizeof(int));
-   *i3 = 3;
-   root->right = new_node(c3, i3);
-
-   char *c4 = calloc(1, sizeof(char));
-   *c4 = 'e';
-
-   int *i4 = calloc(1, sizeof(int));
-   *i4 = 4;
-   root->left->left = new_node(c4, i4);
-
-   char *c5 = calloc(1, sizeof(char));
-   *c5 = 't';
-
-   int *i5 = calloc(1, sizeof(int));
-   *i5 = 5;
-   root->left->right = new_node(c5, i5);
-
+   /*
+  
    int size;
-   size = node_size(root);
+   size = tree_size();
    printf("size is %d\n", size);
 
    
    int depth;
-   depth = subtree_depth(root);
+   depth = tree_depth(tree3);
    printf("depth is %d\n", depth);
    
+   */
+  
  }
