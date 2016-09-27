@@ -40,7 +40,7 @@ node_t *new_node(char *key, void *data)
   node_t *node = calloc(1, sizeof(node_t));
   node->key = key;
   node->data = data;
-  node->left = node->right = NULL;
+  //node->left = node->right = NULL;
   return node;
 }
 
@@ -124,15 +124,13 @@ bool insert_node (node_t *node, char *key, void *data)
 {
   int ret; //return value
   ret = strcmp(key, node->key);
-  
-  // if the tree is empty, return a new node
 
-  /*if (node == NULL) 
+  if (node == NULL)
     {
       new_node(key, data);
+      return true;
     }
-  */
-  
+   
   // key < node->key
   if (ret < 0)
     {
@@ -160,36 +158,36 @@ bool insert_node (node_t *node, char *key, void *data)
 
       else  // node->right == NULL
         {
-          new_node(key, data);
+          node->right = new_node(key, data);
           return true;
         }
     }
-  
-  else
 
+  else
+    
     return false;
+
 }
 
 //TODO tree_insert(tree_t *tree, TODO);
 
-tree_t *tree_insert(tree_t *tree, char *key, void *data)
+bool tree_insert(tree_t *tree, char *key, void *data)
 {
-  //subtree_insert(tree->root, key, data);
-
   if (tree->root == NULL)
     {
       tree->root = new_node(key, data);
       return true;
     }
 
-  else if (tree->root != NULL)
+  else if(tree->root != NULL)
     {
       insert_node(tree->root, key, data);
       return true;
     }
-  
+
   else
     return false;
+ 
 }
 
 char *get_node_key(node_t *node)
@@ -203,15 +201,9 @@ char *get_node_key(node_t *node)
     return NULL;
 }
 
-void print_tree(tree_t *tree)
-{
-  node_t *current = tree->root;
-  while (current != NULL)
-    {
-      printf("tree : %s\n", current->key);
-      current = curr
-    }
-}
+
+
+
 
 
 /// This does not need implementation until Assignment 2
@@ -223,32 +215,30 @@ void print_tree(tree_t *tree)
  int main()
  {
 
+   node_t *root = new_node("kola", (int *)10);
+   root->left = new_node("cool", (int *)8);
+   root->right = new_node("apple", (int *)11);
+   root->left->left = new_node("bee", (int *)12);
+   root->left->right = new_node("cee", (int *)13);
+
    tree_t *tree1;
    tree1 = tree_new();
 
-   //int *i1 = calloc(1, sizeof(int));
-   // *i1 = 10;
+   tree_t *tree2;
+   tree2 = tree_new();
 
-   bool value1 = tree_insert(tree1, "kola", (int *)10);
-   printf("if true return %d\n", value1);
+   bool answer = tree_insert(tree1, "cake", (int *)9);
+   printf("true 1 = %d\n", answer);
 
-
-   tree_t *tree2 = tree_new();
   
-
    
-
-   /*
-  
    int size;
-   size = tree_size();
-   printf("size is %d\n", size);
-
+   size = node_size(root);
+   printf("%d\n", size);
    
    int depth;
-   depth = tree_depth(tree3);
-   printf("depth is %d\n", depth);
+   depth = subtree_depth(root);
+   printf("%d \n", depth);
+ 
    
-   */
-  
- }
+}
