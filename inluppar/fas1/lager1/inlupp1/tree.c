@@ -1,4 +1,5 @@
 # include "tree.h"
+# include "list.h"
 
 // nycklarna i sökträdet är varunamn
 //Varor med samma namn anses vara identiska
@@ -347,52 +348,31 @@ void *get_root_data(tree_t *tree)
     return NULL;
 }
 
-/*
-void *search_subtree_data(node_t *node, char *key)
+
+void node_keys(node_t *node, list_t *keys) //adds the key in a list, in order
 {
-  int ret = strcmp(node->key, key);
-  //  int size = subtree_size(node);
-  void *data;
-  if (node != NULL)
-    {
-      if (ret == 0)
-        {
-          data = get_node_data(node);
-          return data;
-        }
-          
-      else if(ret < 0)
-        {
-          search_subtree_data(node->right, key);
-          data = get_node_data(node->right);
-          return data;
-        }
-      
-      else if (ret > 0)
-        {
-          search_subtree_data(node->left, key);
-          data = get_node_data(node->left);
-          return data;
-        }
-
-      else
-        return NULL;
-          
-    }
-    
-
-  else
-    {
-      printf("empty\n");
-      data = NULL;
-      return data;
-    }
+	if (node == NULL)
+	{
+		return;
+	}
+	node_keys(node->left, keys);
+	list_append(keys, node->key);
+	node_keys(node->right, keys);
+	
 }
-*/
 
+list_t *tree_keys(tree_t *tree) 
+{
+	list_t *keys = list_new();
+	if (tree == NULL)
+	{
+		printf("\nThe tree is empty\n");
+	}
+	node_keys(tree->root, keys);
+	return keys;
+}
 
-
-char *search_data_in_subtree(node_t *node, char *key)
+void *search_data_in_subtree(node_t *node, char *key)
 {
   int ret = strcmp(node->key, key);
   if(node != NULL)
@@ -421,7 +401,7 @@ char *search_data_in_subtree(node_t *node, char *key)
     }
 }
 
-char *search_data_in_tree(tree_t *tree, char *key)
+void *search_data_in_tree(tree_t *tree, char *key)
 {
   return search_data_in_subtree(tree->root, key);
 }
@@ -477,42 +457,46 @@ void print_postorder(tree_t *tree)
   return print_subtree_postorder(tree->root);
 }
 
- int main()
- {
+
+/*
+int main()
+{
 
 
    
-   tree_t *tree1;
-   tree1 = tree_new();
+  tree_t *tree1;
+  tree1 = tree_new();
 
-   
+  
 
-   tree_t *tree2 = tree_insert2(tree1, "apple", "A23");
-   tree_t *tree3 = tree_insert2(tree2, "hola", "A24");
-   tree_t *tree4 = tree_insert2(tree3, "cola", "c25");
-   tree_t *tree5 = tree_insert2(tree4, "dola", "d27");
-   
-
-   print_preorder(tree5);
-
-   puts("-----------------");
-   
-   print_inorder(tree5);
-   
-   puts("-----------------");
-
-   print_postorder(tree5);
-
-   puts("-----------------");
-   
-   char *k1 = search_data_in_tree(tree5, "dola");
-   printf("dola is on %s\n", k1);
-
-
-   char *k2 = search_data_in_tree(tree5, "hola");
-   printf("hola is on %s\n", k2);
-   
-   int size = tree_size(tree4);
-   printf("%d\n", size);
+  tree_t *tree2 = tree_insert2(tree1, "apple", "A23");
+  tree_t *tree3 = tree_insert2(tree2, "hola", "A24");
+  tree_t *tree4 = tree_insert2(tree3, "cola", "c25");
+  tree_t *tree5 = tree_insert2(tree4, "dola", "d27");
+  
+  
+  print_preorder(tree5);
+  
+  puts("-----------------");
+  
+  print_inorder(tree5);
+  
+  puts("-----------------");
+  
+  print_postorder(tree5);
+  
+  puts("-----------------");
+  
+  char *k1 = search_data_in_tree(tree5, "dola");
+  printf("dola is on %s\n", k1);
+  
+  
+  char *k2 = search_data_in_tree(tree5, "hola");
+  printf("hola is on %s\n", k2);
+  
+  int size = tree_size(tree4);
+  printf("%d\n", size);
    
 }
+
+*/
