@@ -11,222 +11,224 @@ typedef struct item item_t;
 
 typedef struct shelf shelf_t;
 
-typedef struct action action_t;
+//typedef struct action action_t;
 
-struct item    // tree
+struct item    
 {
   char *name;
   char *description;
   int price;
-  list_t *shelf_check;   //shelf
-  list_t *amount_check;   //amount
+  shelf_t *shelf_control;
 };
-
 
 struct shelf
 {
-  char *shelf_id;    // hyllnummer
+  char *shelf_nr; 
   int amount;
 };
 
-struct action
+shelf_t *make_shelf(char *shelf_nr, int amount)
 {
-  enum { NOTHING, ADD, REMOVE, EDIT } TYPE;
-  item_t *added;    //add
-  item_t *edited;    // edit
-  item_t *original;   //edit
-  item_t *removed;
-  bool exist;
-};
-
-
-void check_shelf(list_t *shelf_check)  // printa ut  hyllnummer
-{
-  int i;
-  int length = list_length(shelf_check);
-  shelf_t *shelf;
-
-  for(i = 0; i < length; i++)
+  shelf_t *shelf = calloc(1, sizeof(shelf_t));
+  if (shelf == NULL)
     {
-      shelf = list_get(shelf_check, i);
-      printf("Shelf %s\n", shelf->shelf_id); 
+      printf("The shelf is NULL\n");
+      return NULL;
     }
-}
-void check_amount(list_t *amount_check) //printa ut amount
-{
-  int i;
-  int length = list_length(amount_check);
-  shelf_t *amount;
 
-  for(i = 0, i < length; i++)
+  else
     {
-      amount = list_get(amount_check, i);
-      printf("Amount %d\n", amount->amount);
+      shelf->shelf_nr = shelf_nr;
+      shelf->amount = amount;
     }
-  
+  return shelf;
 }
-                 
-bool check_exist(); // tree_t *db, char *shelf
 
-item_t *input_item(tree_t *db)
+char *get_shelf_nr(shelf_t *shelf)
 {
-  char *name, *desc, *shelf;
+  return shelf->shelf_nr;
+}
+
+int get_amount(shelf_t *shelf)
+{
+  return shelf->amount;
+}
+
+// without shelf specification
+item_t *make_item(char *name, char *desc, int price, shelf_t *shelf)
+{
+  item_t *item = calloc(1, sizeof(item_t));
+  if (item != NULL)
+    {
+      item->name = name;
+      item->description = desc;
+      item->price = price;
+      item->shelf_control = shelf;
+    }
+  return item;
+}
+
+// with shelf location
+item_t *item_on_shelf(char *name, char *desc, int price, char *shelf_nr, int amount)
+{
+  shelf_t *shelf = make_shelf(shelf_nr, amount);
+  return make_item(name, desc, price, shelf);
+}
+
+item_t *input_item()
+{
+  char *name, *desc;
   int price;
-  item_t *item = get_tree_key(db);
-  bool exist = check_exist();
-  list_t *shelf_control;
-  //item_t *item =  en funktion som gräver  tree_get
+  char *shelf_nr;
+  int amount;
 
-  if (item == NULL)
-    {
-      name = ask_question_string("Enter the product name?\n");
-      desc = ask_question_string("Describe the product\n");
-      price = ask_question_int("Enter the price?\n");
-      // shelf = ask_question_shelf("Enter the shelf nr.\n");
-    }
+  name = ask_question_string("Enter the product name?\n");
   
-}
+  desc = ask_question_string("Describe the product\n");
+  
+  price = ask_question_int("Enter the price?\n");
+  
+  shelf_nr = ask_question_shelf("Enter the shelf nr.\n");
 
-void add_item(tree_t *db, action_t *action)
-{
+  amount = ask_question_int("Enter the amount\n");
+
+  item_t *item = item_on_shelf(name, desc, price, shelf_nr, amount);
+  return item;
   
 }
 
 void print_item(item_t *item)
 {
-  int heltal = (item->price)/100;
-  int decimal = (item->price)%100;
+  int q, r; //qutient, remainder
+  q = (item->price)/100;
+  r = (item->price)%100;
   char *name = item->name;
-  char *desc = item->description;
-  list_t *shelf_control = item->shelf_control;  
+  char *description = item->description;
+  shelf_t *shelf = item->shelf_control;
+  char *shelf_nr = get_shelf_nr(shelf);
+  int amount = get_amount(shelf);
 
-  printf("\n Name: %s\n", name);
-  printf("Desc: %s\n", desc);
-  printf("Price: %d.%d\n", heltal, decimal);
-  // printf("Shelf: %s\n", shelf);
-  //printf("Amount: %d\n", amount);
-
-  
-  
-}
-
-
-bool is_char(char *str)
-{
-  int len = strlen(str);
- 
-  for (int i = 0; i < len;)
-    {
-      if (i == 0 && isdigit(str[0]) == false && isupper(str[0]) && len > 1)
-        {
-          i++;
-        }
-      else if (i == 0 && isdigit(str[0]))
-        {
-          return false;
-        }
-      else
-        {
-          if (isdigit(str[i]) == false)
-            {
-              return false;
-            }
-          i++;
-        }
-    }
-  return true;
-}
-
-char *ask_question_shelf(char *question)
-{
-  return ask_question(question, is_char, (convert_func) strdup).s;
+  printf("Name: %s\n"
+         "Description: %s\n"
+         "Price: %d.%d kr\n"
+         "Shelf: %s\n"
+         "Amount: %d\n",
+         name, description, q, r, shelf_nr, amount);
 }
 
 void print_menu()
 {
-  printf("\n");
-  printf(" [A]dd an item\n");
-  printf(" [E]dit an item\n");
-  printf(" [L]ist entire items\n");
-  printf(" [D]isplay a specific item\n");
-  printf(" [R]emove an item\n");
-  printf(" [U]ndo\n");
-  printf(" [Q]uit\n");
-  printf("\n");
+  printf("\n[A]-Add a new item\n"
+         "[R]-Remove an item\n"
+         "[E]-Edit an item\n"
+         "[U]-Undo\n"
+         "[D]-Display an item\n"
+         "[P]-Print list\n"
+         "[Q]-Quit\n");
+
 }
 
-
-char ask_question_menu()
+bool is_answer_edit_item (char *answer)
 {
-  char *key = "AaEeLlDdRrUuQq";
-  int i = 0;   // index till key
-  char *answer;  
-  int check = 0; //signal till loop
-  char ch;
+  char *valid_capital_answers = "NDPSA";
+  char *valid_lowercase_answers = "ndpsa";
   
-  print_menu();
-
-  while (check == 0)  
+  for (int i = 0; i < strlen(valid_capital_answers); ++i)
     {
-      answer = ask_question_string("Enter the key!\n");
-      if (strlen(answer) == 1)
+      if (answer[0] == valid_capital_answers[i] && strlen(answer) == 1)
         {
-          for (i = 0; i < strlen(key); i++)
-            {
-              if(answer[0] == key[i])
-                {
-                  ch = toupper(answer[0]);
-                  check = 1;  // slutar loppa när det är ett rätt svar
-                }
-            }
+          return true;
+        }
+      if (answer[0] == valid_lowercase_answers[i] && strlen(answer) == 1)
+        {
+          return true;
         }
     }
-  return ch;
+  
+  return false;
 }
 
-void edit_item(tree_t *db, action_t *action);
-void list_items(tree_t *db, action_t *action);
-void display_item(tree_t *db, action_t *action);
-void undo(action_t *action);
-void remove_item();
-
-void event_loop(tree_t *db, action_t *action)
+bool is_item_in_db(tree_t *db, char *name) // name som vi matar in  
 {
-  char meny_key;
-  do
-    {
-      meny_key = ask_question_menu();
-      if(meny_key == 'A' || meny_key == 'a')
-        {
-          add_item(db, action);
-        }
-      else if(meny_key == 'E' || meny_key == 'e')
-        {
-          edit_item(db, action);
-        }
-      else if(meny_key == 'L' || meny_key == 'l')
-        {
-          list_items(db, action);  //list_db
-        }
-      else if(meny_key == 'D' || meny_key == 'd')
-        {
-          display_item(db, action);
-        }
-      else if(meny_key == 'U' || meny_key == 'u')
-        {
-          undo(action);
-        }
-      else if(meny_key == 'R' || meny_key == 'r')
-        {
-          printf("Not implemented\n");
-        }
-    }
-  while(meny_key != 'Q');  // quit program, exit
+  return is_key_in_tree(db, name);
 }
 
+bool is_shelf_taken(tree_t *db, char *name, char *shelf)
+{
+  return is_data_in_tree(db, name, shelf);
+}
+
+char *answer_to_shelf_question(tree_t *db, char *name, char *shelf_question)
+{
+  char *shelf_input = ask_question_shelf(shelf_question);
+
+  if (is_shelf_taken(db, name, shelf_input) == true)
+    {
+      printf("%s is taken by %s\n", shelf_input, name);
+      shelf_input = ask_question_shelf(shelf_question);
+    }
+  return shelf_input;
+}
+
+/*
+void add_goods(tree_t *db)
+{
+  char *name = ask_question_string("Name:");
+  if (is_item_in_db(db, name) == true)
+    {
+      printf("%s already exist.\n", name);
+      char *shelf_nr = answer_to_shelf_question(db, name, "Shelf nr: ");
+      int amount = ask_question_int("Amount:");
+      
+    }
+
+  else if(is_item_in_db(db, name) == false && is_shelf_taken(db, name, 
+    {
+      char *description = ask_question_string("Description:");
+      int price = ask_question_int("Price:");
+      
+      
+    }
+      
+}
+*/
+
+void display_goods(tree_t *db, int i);
 
 int main()
-{
-  printf("Inventory management 1.0\n ================================\n\n");
-  tree_t *data_base = tree(new);
-  
+  {
+    printf("Welcome to warehouse management 1.0\n ====================================\n");
+    print_menu();
+    tree_t *db = tree_new();
+    shelf_t *s1 = make_shelf("A23", 4);
+    shelf_t *s2 = make_shelf("A24", 5);
+    shelf_t *s3 = make_shelf("A35", 6);
+    //item_t *i1 = item_on_shelf("honey", "bee", 2459, "A23", 4);
+    tree_t *db1;
+    db1 = tree_insert2(db, "apple", s1);
+
+    tree_t *db2;
+    db2 = tree_insert2(db1, "chocola", s2);
+
+    tree_t *db3;
+    db3 = tree_insert2(db2, "kola", s3);
+    
+    
+     int size = tree_size(db3);
+    printf("%d\n", size);
+    
+    bool finns;
+    finns = is_item_in_db(db3, "kola");
+    printf("%d\n", finns);
+
+
+    bool shelf;
+    shelf = is_shelf_taken(db3, "kola", "A35");
+    printf("%d\n", shelf);
+
+    item_t *goods = item_on_shelf("apple", "red, crisp fruit", 4556, "A23", 6);
+
+    print_item(goods);
+
+    
+  }
