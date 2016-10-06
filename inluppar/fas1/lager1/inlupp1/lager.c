@@ -72,21 +72,26 @@ char *get_shelf_name(tree_t *db)
   return temp;
 }
 */
-/*
+
 bool is_shelf_taken(tree_t *db, char *shelf)
 {
   char *temp;
-  char *shelf_input = ask_question_shelf("Enter the shelf\n");
+  //char *shelf_input = ask_question_shelf("Enter the shelf\n");
   list_t *shelves_list = extract_shelves(db);
   int length = list_length(shelves_list);
   for (int i = 0; i < length; ++i)
     {
-      storage_t *temp = list_get(shelves_list, i);
-      
+      temp = list_get(shelves_list, i);
+      if (strcmp(shelf, temp) == 0)
+        {
+          printf("%s is already taken\n", shelf);
+          return true;
+        }
     }
   
+  return false;
 }
-*/
+
 /*
 //shelf som är upptagen för varan
 char *answer_to_shelf_question(tree_t *db, char *name, char *shelf_question)
@@ -333,7 +338,8 @@ int main()
 
   // char *sh = get_shelf_name(db);
 
-  printf("%s\n", sh);
+  bool exist = is_shelf_taken(db, "A23");
+  printf("%d \n", exist);
   
   
   
