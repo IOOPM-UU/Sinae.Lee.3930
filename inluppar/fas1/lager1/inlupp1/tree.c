@@ -1,5 +1,6 @@
 # include "tree.h"
 # include "list.h"
+# include "item.h"
 
 // nycklarna i sökträdet är varunamn
 //Varor med samma namn anses vara identiska
@@ -20,15 +21,6 @@ struct node{
   node_t *left;
   node_t *right;
 };
-
-/// \file tree.h
-///
-/// \author Tobias Wrigstad
-/// \version 1.0
-/// \date 2015-08-28
-/// \bug This file is partial. (On purpose.)
-
-
 
 // create a new node
 node_t *new_node(char *key, void *data)
@@ -112,60 +104,45 @@ int tree_depth(tree_t *tree)
     return subtree_depth(tree->root);
 }
 
-
-// https://www.tutorialspoint.com/c_standard_library/c_function_strcmp.htm
-// http://stackoverflow.com/questions/19724546/creating-a-binary-search-tree-with-strings
-//http://quiz.geeksforgeeks.org/binary-search-tree-set-1-search-and-insertion/
-bool insert_node (node_t *node, char *key, void *data)
+node_t *insert_node (node_t *node, char *key, void *data)
 {
-  int ret; //return value
-  ret = strcmp(key, node->key);
-
   if (node == NULL)
     {
-      new_node(key, data);
-      return true;
+      return new_node(key, data);
     }
-   
-  // key < node->key
-  if (ret < 0)
+
+  else if (node != NULL)
     {
-      if (node->left)
+       // key < node->key
+      if (strcmp(key, node->key) < 0)
         {
-          insert_node (node->left, key, data);
-          return true;
+          if (node->left != NULL)
+            {
+              node->left = insert_node (node->left, key, data);
+            }
+          
+          else // node->left == NULL
+            {
+              node->left = new_node(key, data);
+            }
         }
 
-      else // node->left == NULL
+      // key > node->key
+      else if ( strcmp(key, node->key) > 0)
         {
-          new_node(key, data);
-          return true;
+          if (node->right != NULL)
+            {
+              node->right = insert_node (node->right, key, data);
+            }
+
+          else  // node->right == NULL
+            {
+              node->right = new_node(key, data);
+            }
         }
     }
-
-  // key > node->key
-  else if (ret > 0)
-    {
-      if (node->right != NULL)
-        {
-          insert_node (node->right, key, data);
-          return true;
-        }
-
-      else  // node->right == NULL
-        {
-          node->right = new_node(key, data);
-          return true;
-        }
-    }
-
-  else
-    
-    return false;
-
+  return node;
 }
-
-
 //TODO tree_insert(tree_t *tree, TODO);
 
 bool tree_insert(tree_t *tree, char *key, void *data)
@@ -187,73 +164,9 @@ bool tree_insert(tree_t *tree, char *key, void *data)
  
 }
 
-void insert_node2 (node_t *node, char *key, void *data)
-{
-    int ret; //return value
-    ret = strcmp(node->key, key);
-    
-    if (node == NULL)
-    {
-        new_node(key, data);
-    }
-    
-    //  node->key < key
-    if (ret < 0)
-    {
-        if (node->right != NULL)
-        {
-          insert_node2 (node->right, key, data);
-        }
-        
-        else // node->left == NULL
-        {
-            node->right = new_node(key, data);
-        }
-    }
-    
-    // node->key > key
-    else if (ret > 0)
-    {
-        if (node->left != NULL)
-        {
-            insert_node2 (node->left, key, data);
-        }
-        
-        else  // node->left == NULL
-        {
-            node->left = new_node(key, data);
-        }
-    }
-    
-    else if (ret == 0)
-      {
-        node->key = key;
-      }
-
-    else
-      return;
-    
-}
-
-tree_t *tree_insert2(tree_t *tree, char *key, void *data)
-{
-  if (tree->root != NULL)
-    {
-      insert_node2(tree->root, key, data);
-      return tree;
-    }
-
-  else
-    {
-      tree->root = new_node(key, data);
-      return tree;
-    }
-}
-
-
 char *get_node_key(node_t *node)
 {
-  if (node != NULL)
+  if (node)
     {
       return node->key;
     }
@@ -265,7 +178,7 @@ char *get_node_key(node_t *node)
 
 void *get_node_data(node_t *node)
 {
-  if (node != NULL)
+  if (node)
     {
       return node->data;
     }
@@ -275,21 +188,50 @@ void *get_node_data(node_t *node)
     return NULL;
 }
 
+
+char *get_shelf_node(node_t *node)
+{
+  char *shelf;
+  item_t *item = get_node_data(node);
+  return shelf = get_shelf_nr(item);
+}
+
+void node_shelf_list(node_t *node, list_t *list)
+{
+  if (node == NULL) {return;}
+  node_shelf_list(node->left, list);
+  char *shelf = get_shelf_node(node);
+  list_append(list, shelf);
+  node_shelf_list(node->right, list);
+}
+  
+list_t *list_node_shelf(tree_t *tree) //en lista med alla upptagna hyllor
+{
+  list_t *shelves = list_new();
+  if (tree == NULL)
+    {
+      printf("\nThe tree is empty\n");
+    }
+  node_shelf_list(tree->root, shelves);
+  return shelves;
+}
+
+
 bool is_key_in_subtree(node_t *node, char *key)
 {
-  int ret = strcmp(key, node->key);
+  // int ret = strcmp(key, node->key);
+  
   if (node == NULL)
     {
-      printf("Empty\n");
       return false;
     }
 
-  else if(ret < 0)
+  else if(strcmp(key, node->key) < 0)
     {
       return is_key_in_subtree(node->left, key);
     }
 
-  else if(ret > 0)
+  else if(strcmp(key, node->key) > 0)
     {
       return is_key_in_subtree(node->right, key);
     }
@@ -305,49 +247,64 @@ bool is_key_in_tree(tree_t *tree, char *key)
   return is_key_in_subtree(tree->root, key);
 }
 
+void node_data(node_t *node, list_t *list)
+{
+  if (node == NULL)
+    {
+      return;
+    }
+
+  node_data(node->left, list);
+  storage_t *storage = get_node_data(node);
+  list_append(list, storage);
+  node_data(node->right, list);
+}
+
+list_t *list_node_data(tree_t *tree)
+{
+  list_t *data = list_new();
+  if (tree == NULL)
+    {
+      printf("tree is empty\n");
+    }
+  node_data(tree->root, data);
+  return data;
+}
+
+
 bool is_data_in_subtree(node_t *node, char *key, void *data)
 {
-  int ret =  strcmp(key, node->key);
   if(node == NULL)
     {
-      printf("empty\n");
       return false;
     }
 
-  else if(ret < 0)
+  else if(strcmp(key, node->key) < 0)
     {
       return is_data_in_subtree(node->left, key, data);
     }
 
-  else if(ret > 0)
+  else if(strcmp(key, node->key) > 0)
     {
       return is_data_in_subtree(node->right, key, data);
     }
 
-  else
+  else if(strcmp(key, node->key) == 0)
     {
       data = node->data;
       return true;
     }
-  
+
+  else
+    {
+      return false;
+    }
 }
 
 bool is_data_in_tree(tree_t *tree, char *key, void *data)
 {
   return is_data_in_subtree(tree->root, key, data);
 }
-
-void *get_root_data(tree_t *tree)
-{
-  if (tree != NULL)
-    {
-      void *info = get_node_data(tree->root);
-      return info;
-    }
-  else
-    return NULL;
-}
-
 
 void node_keys(node_t *node, list_t *keys) //adds the key in a list, in order
 {
@@ -372,17 +329,20 @@ list_t *tree_keys(tree_t *tree)
 	return keys;
 }
 
+
+
 void *search_data_in_subtree(node_t *node, char *key)
 {
-  int ret = strcmp(node->key, key);
+  //int ret = strcmp(node->key, key);
+  
   if(node != NULL)
     {
-      if (ret == 0)
+      if (strcmp(node->key, key) == 0)
         {
           return node->data;
         }
 
-      else if (ret < 0)
+      else if (strcmp(node->key, key) < 0)
         {
           return search_data_in_subtree(node->right, key);
         }
@@ -396,7 +356,7 @@ void *search_data_in_subtree(node_t *node, char *key)
   else
     
     {
-      printf("Empty\n");
+      printf("There is no such keyE\n");
       return NULL;
     }
 }
@@ -406,56 +366,7 @@ void *search_data_in_tree(tree_t *tree, char *key)
   return search_data_in_subtree(tree->root, key);
 }
 
-// displays root node, left node, right node
-void print_subtree_preorder(node_t *node)
-{
-  if (node)
-    {
-      printf("%s, %s\n", node->key, node->data);
-      print_subtree_preorder(node->left);
-      print_subtree_preorder(node->right);
-    }
-}
 
-void print_preorder(tree_t *tree)
-{
-  if (tree)
-    {
-      return print_subtree_preorder(tree->root);
-    }
-}
-
-//displays left node, rott node, right node
-void print_subtree_inorder(node_t *node)
-{
-  if(node)
-    {
-      print_subtree_inorder(node->left);
-      printf("%s, %s\n", node->key, node->data);
-      print_subtree_inorder(node->right);
-    }
-}
-
-void print_inorder(tree_t *tree)
-{
-  return print_subtree_inorder(tree->root);
-}
-
-//displays left node, right node, root node
-void print_subtree_postorder(node_t *node)
-{
-  if(node)
-    {
-      print_subtree_postorder(node->left);
-      print_subtree_postorder(node->right);
-      printf("%s, %s\n", node->key, node->data);
-    }
-}
-
-void print_postorder(tree_t *tree)
-{
-  return print_subtree_postorder(tree->root);
-}
 
 
 /*
@@ -498,5 +409,6 @@ int main()
   printf("%d\n", size);
    
 }
-
 */
+
+

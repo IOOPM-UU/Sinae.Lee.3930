@@ -58,31 +58,16 @@ list_t *extract_shelves(tree_t *db)
   return list_of_shelves;
 }
 
-/*
-char *get_shelf_name(tree_t *db)
-{
-  char *temp;
-  int size = tree_size(db);
-  list_t *shelves_list = extract_shelves(db);
-  // int length = list_length(shelves_list);
-  for (int i = 0; i < size; i++)
-    {
-      temp = list_get(shelves_list, i);
-    }
-  return temp;
-}
-*/
-
 bool is_shelf_taken(tree_t *db, char *shelf)
 {
   char *temp;
-  //char *shelf_input = ask_question_shelf("Enter the shelf\n");
-  list_t *shelves_list = extract_shelves(db);
-  int length = list_length(shelves_list);
-  for (int i = 0; i < length; ++i)
+  list_t *shelf_list = extract_shelves(db);
+  int length = list_length(shelf_list);
+
+  for (int i = 0; i < length; i++)
     {
-      temp = list_get(shelves_list, i);
-      if (strcmp(shelf, temp) == 0)
+      temp = list_get(shelf_list, i);
+      if (strcmp(temp, shelf) == 0)
         {
           printf("%s is already taken\n", shelf);
           return true;
@@ -328,22 +313,60 @@ int main()
   item_t *item3 = item_on_shelf("cat", "fluffy", 3000, "C21", 1);
   item_t *item4 = item_on_shelf("pig", "pinky", 2457, "D21", 3);
   item_t *item5 = item_on_shelf("cow", "moo", 3120, "K21", 4);
+  item_t *item6 = item_on_shelf("bird", "tiny", 3120, "L21", 4);
+
+  item_t *item7 = item_on_shelf("cola", "fizzy", 4550, "E23", 2);
+  item_t *item8 = item_on_shelf("wolf", "animal", 5550, "T21", 1);
+  item_t *item9 = item_on_shelf("dog", "voff", 3000, "M21", 1);
+  item_t *item10 = item_on_shelf("hallon", "sour", 2457, "P21", 3);
+  item_t *item11 = item_on_shelf("zebra", "sabanah", 3120, "G21", 4);
+  item_t *item12 = item_on_shelf("sparv", "bird", 3120, "W21", 4);
+  
   
   tree_insert(db, "apple", item1);
   tree_insert(db, "bulle", item2);
   tree_insert(db, "cat", item3);
   tree_insert(db, "pig", item4);
   tree_insert(db, "cow", item5);
+  tree_insert(db, "bird", item6);
+  tree_insert(db, "cola", item7);
+  tree_insert(db, "wolf", item8);
+  tree_insert(db, "dog", item9);
+  tree_insert(db, "hallon", item10);
+  tree_insert(db, "zebra", item11);
+  tree_insert(db, "sparv", item12);
+  
   
 
-  // char *sh = get_shelf_name(db);
+  int t_size = tree_size(db);
+  printf("tree size is %d\n", t_size);
+  
 
-  bool exist = is_shelf_taken(db, "A23");
-  printf("%d \n", exist);
+  
+
+  bool exist1 = is_shelf_taken(db, "W21");
+  printf("%d \n", exist1);
+
+  bool exist2 = is_shelf_taken(db, "C21");
+  printf("%d \n", exist2);
+
+  bool exist3 = is_shelf_taken(db, "B21");
+  printf("%d \n", exist3);
+
+  bool exist4 = is_shelf_taken(db, "K21");
+  printf("%d \n", exist4);
+
+  bool exist5 = is_shelf_taken(db, "L21");
+  printf("%d \n", exist5);
+
   
   
+  list_t *l = extract_shelves(db);
   
+  int l_length = list_length(l);
+  printf("%d\n", l_length);
+
+ 
   
-  
-  
+  print_list(l);
 }
