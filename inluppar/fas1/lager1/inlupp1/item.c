@@ -129,18 +129,6 @@ void print_item(item_t *item)
          name, description, q, r, shelf, amount);
 }
 
-void print_menu()
-{
-  printf("\n[A]-Add a new item\n"
-         "[R]-Remove an item\n"
-         "[E]-Edit an item\n"
-         "[U]-Undo\n"
-         "[D]-Display an item\n"
-         "[P]-Print list\n"
-         "[Q]-Quit\n");
-}
-
-
 item_t *edit_item_name(item_t *item) //Ändra i trädets ordning också?
 {
 	//print old name
