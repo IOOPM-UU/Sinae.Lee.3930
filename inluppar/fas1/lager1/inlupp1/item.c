@@ -108,6 +108,8 @@ item_t *input_item()
   return item;
 }
 
+
+
 void print_item(item_t *item)
 {
   int q, r; //qutient, remainder
@@ -222,4 +224,35 @@ item_t *edit_item_amount(item_t *item)
 	item->storage->amount = new_amount;
 	printf("\nNew amount is: %d\n", new_amount);
 	return item;
+}
+
+// increase item amount and display item
+item_t *increase_item_amount(item_t *item)
+{
+    //print old amount
+    item_t *old_item = item;
+    int old_amount = get_amount(old_item->storage); //old_item->storage_control->amount;
+    printf("\nCurrent amount: %d\n", old_amount);
+    printf("--------------------------------------------------------\n");
+    //ask for new amount
+    int add_amount = ask_question_int("Enter amount: ");
+    //add amount
+    item->storage->amount = old_amount + add_amount;
+    int new_amount = item->storage->amount;
+    printf("\nNew amount is: %d\n", new_amount);
+    return item;
+}
+
+char *get_item_shelf(item_t *item)
+{
+  char *shelf;
+  
+  shelf = item->storage->shelf;
+  return shelf;
+}
+
+char *get_item_name(item_t *item)
+{
+  char *name = item->name;
+  return name;
 }

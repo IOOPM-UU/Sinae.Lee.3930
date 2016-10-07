@@ -30,6 +30,8 @@ item_t *input_item();
 
 void print_item(item_t *item);
 
+void print_menu();
+
 item_t *edit_item_name(item_t *item);
 
 item_t *edit_item_desc(item_t *item);
@@ -39,6 +41,12 @@ item_t *edit_item_price(item_t *item);
 item_t *edit_item_shelf(item_t *item);
 
 item_t *edit_item_amount(item_t *item);
+
+item_t *increase_item_amount(item_t *item);
+
+char *get_item_shelf(item_t *item);
+
+char *get_item_name(item_t *item);
 
 
 
