@@ -10,29 +10,18 @@
 
 
 
-//typedef struct action action_t;
+typedef struct action action_t;
 
-
-
-bool is_answer_edit_item (char *answer)
+struct action
 {
-  char *valid_capital_answers = "NDPSA";
-  char *valid_lowercase_answers = "ndpsa";
-  
-  for (int i = 0; i < strlen(valid_capital_answers); ++i)
-    {
-      if (answer[0] == valid_capital_answers[i] && strlen(answer) == 1)
-        {
-          return true;
-        }
-      if (answer[0] == valid_lowercase_answers[i] && strlen(answer) == 1)
-        {
-          return true;
-        }
-    }
-  
-  return false;
-}
+  enum { NOTHING, ADD, REMOVE, EDIT } TYPE;
+  item_t *added;    //add
+  item_t *edited;    // edit
+  item_t *old;   //edit
+  //item_t *removed;
+  list_t *origin_list;
+  bool exist;
+};
 
 bool is_item_in_db(tree_t *db, char *name) // name som vi matar in  
 {
@@ -77,7 +66,6 @@ bool is_shelf_taken(tree_t *db, char *shelf)
   return false;
 }
 
-
 char *answer_to_shelf_question(tree_t *db) 
 {
   char *input = ask_question_shelf("Enter the shelf:");
@@ -92,112 +80,209 @@ char *answer_to_shelf_question(tree_t *db)
   return input;
 }
 
-
-int sublist_items(tree_t *db, int i) //prints out the keys, in-order
-{
-	printf("\n========= List of items ========\n");
-	list_t *keys = tree_keys(db);
-	int length = list_length(keys);
-	int count = 0; // kanske inte behövs, kanske räcker med i % 20
-	
-	if (length == 0)
-	{
-		printf("\nThe tree is empty\n");
-		return 0;
-	}
-	
-	for (; i < length && count < 20; ++i, ++count)
-	{
-		char *key = list_get(keys, i);
-		printf("%d.\t%s\n", i % 20 + 1, key);
-	}
-	//printf("i is %d\n",i);
-	if (length < 20)
-	{
-		char *answer = ask_question_string("\n[E]dit an item\n"
-										   "[B]ack to menu\n");
-		if (answer[0] == 'E' || answer[0] == 'e')
-		{
-			printf("Edit item\n");
-		}
-		if (answer[0] == 'B' || answer[0] == 'b')
-		{
-			return 0;
-		}
-	}
-	
-	if (length > 20 && i == 20) //there's 21 items or more
-	{
-		char *answer = ask_question_string("\n[N]ext page\n"
-										   "[E]dit an item\n"
-										   "[B]ack to menu\n");
-		if (answer[0] == 'N' || answer[0] == 'n')
-		{
-			sublist_items(db,i);
-		}
-		if (answer[0] == 'E' || answer[0] == 'e')
-		{
-			printf("Edit item\n");
-		}
-		if (answer[0] == 'B' || answer[0] == 'b')
-		{
-			return 0;
-		}
-	}
-	if (length > 20 && i > 20 && i % 20 == 0)
-	{
-		printf("i is %d", i);
-		char *answer = ask_question_string("\n[N]ext page\n"
-								   "[P]revious page\n"
-								   "[E]dit an item\n"
-								   "[B]ack to menu\n");
-		if( answer[0] == 'N' || answer[0] == 'n')
-		{
-			sublist_items(db,i);
-		}
-		if (answer[0] == 'P' || answer[0] == 'p')
-		{
-			sublist_items(db, i-40);
-		}
-		if (answer[0] == 'E' || answer[0] == 'e')
-		{
-			printf("Edit item 2\n");
-		}
-		if (answer[0] == 'B' || answer[0] == 'b')
-		{
-			return 0;
-		}
-	}
-	if (length > 20 && i % 20 != 0)
-	{
-		printf("i is %d\n",i);
-		printf("mod 20 is %d\n", i % 20);
-		printf("i - i mod 20 is %d\n", i - (i%20));
-		char *answer = ask_question_string("\n[P]revious page\n"
-										   "[E]dit an item\n"
-										   "[B]ack to menu\n");
-		if (answer[0] == 'P' || answer[0] == 'p')
-		{
-			sublist_items(db,i - (i%20)-20);
-		}
-		if (answer[0] == 'E' || answer[0] == 'e')
-		{
-			printf("Edit item 3\n");
-		}
-		if (answer[0] == 'B' || answer[0] == 'b')
-		{
-			return 0;
-		}
-	}
-	return 0;
-}
-
-
 //visar innehållet av item
 void *item_spec(tree_t *db, char *name)
 {
   return search_data_in_tree(db, name);
 }
+
+
+
+
+bool aux_list_items(tree_t *db, int index) //prints out the keys, in-order
+{
+	printf("\n========= List of items ========\n");
+	
+	list_t *keys = tree_keys(db);
+	int length = list_length(keys);
+	bool show_next;// = show_next_page(length, index);
+	bool show_prev;// = show_prev_page(length, index);
+	int count = 0; // kanske inte behövs, kanske räcker med index % 20
+	int prev_i = index;
+       
+	if (length == 0)
+	{
+		printf("\nThe tree is empty\n");
+		return false;
+	}
+	
+	for (; index < length && count < 20; ++index) // byta ut count < 20 mot index % 20 < 20
+	{
+		char *key = list_get(keys, index);
+		printf("%d.\t%s\n", index % 20 + 1, key);
+		++count;
+	}
+	printf("\nItem's index from %d to %d\n", prev_i, index-1);
+	
+	show_next = show_next_page(length, index);
+	show_prev = show_prev_page(length, index);
+	
+	if (length <= 20)
+	{
+          char answer = ask_question_list_menu(show_next, show_prev);
+		if (answer == 'E')
+		{
+			printf("Edit item\n");
+			return true;
+		}
+		if (answer == 'D')
+		{
+                  printf("\n"
+                         "Display item\n");
+                  
+                  int index_nr = ask_question_int("\n"
+                                                  "Please enter the item number\n");
+                  int item_nr = index_nr - 1;
+
+                  char *item_name = strdup((char *)list_get(keys, item_nr));
+
+                  void *item_show = item_spec(db, item_name);
+                  print_item(item_show);
+                  
+                  
+                  return true; //eller false för att återgå till list?
+		}
+		if (answer == 'B')
+		{
+			return false;
+		}
+		printf("\nInvalid input 1\n");
+		aux_list_items(db,index - (index % 20));
+		return true;
+	}
+	
+	if (length > 20 && index == 20) //there's 21 items or more
+	{
+		char answer = ask_question_list_menu(show_next, show_prev);
+		if (answer == 'N')
+		{
+                  aux_list_items(db,index);
+                          
+                  return true;
+		}
+		if (answer == 'E')
+		{
+			printf("Edit item\n");
+			return true;
+		}
+                
+		if (answer == 'D'&& answer != 'N')
+		{
+                  printf("Display item\n");
+
+                  int index_nr = ask_question_int("\n"
+                                                  "Please enter the item number\n");
+                  int item_nr = index_nr -1;
+
+                  char *item_name = strdup((char *)list_get(keys, item_nr));
+
+                  void *item_show = item_spec(db, item_name);
+                  print_item(item_show);
+                  
+                  return true; // eller false
+		}
+
+		if (answer == 'B')
+		{
+			return false;
+		}
+		printf("\nInvalid input 2\n");
+		aux_list_items(db, index - 20);
+		return true;
+	}
+	
+	if (length > 20 && index > 20 && index % 20 == 0)
+	{
+
+		char answer = ask_question_list_menu(show_next, show_prev);
+		if( answer == 'N')
+		{
+			aux_list_items(db,index);
+			return true;
+		}
+		if (answer == 'P')
+		{
+			aux_list_items(db, index-40);
+			return true;
+		}
+		if (answer == 'E')
+		{
+			printf("Edit item 2\n");
+			return true;
+		}
+		if (answer == 'D')
+		{
+                  printf("Display item\n");
+                        
+                  return true; //eller false
+		}
+		if (answer == 'B')
+		{
+			return false;
+		}
+		printf("\nInvalid input 3\n");
+		aux_list_items(db, index - 20);
+		return true;
+	}
+	
+	if (length > 20 && index > 20 && index % 20 != 0)
+	{
+
+		char answer = ask_question_list_menu(show_next, show_prev);
+		if (answer == 'P')
+		{
+			aux_list_items(db,index - (index%20)-20);
+			return true;
+		}
+		if (answer == 'E')
+		{
+			printf("Edit item 3\n");
+			return true;
+		}
+		if (answer == 'D')
+		{
+			printf("Display item\n");
+                        
+                        int index_nr = ask_question_int("\n"
+                                                        "Please enter the item number\n");
+                        int item_nr = index_nr+20-1 ;
+
+                        char *item_name = strdup((char *)list_get(keys, item_nr));
+                        void *item_show = item_spec(db, item_name);
+                        print_item(item_show);
+                  
+			return true; //eller false
+		}
+		if (answer == 'B')
+		{
+			return false;
+		}
+		printf("\nInvalid input 4\n");
+		aux_list_items(db,index - (index%20));
+		return true;
+	}
+	
+	if (aux_list_items(db, index)) // if true
+	{
+		return true;
+	}
+	return false;
+}
+
+void list_items(tree_t *db)
+{
+	int db_size = tree_size(db);
+	if (db_size == 0)
+	{
+		printf("The database is empty\n");
+	}
+	
+	if(db_size > 0)
+	{
+		aux_list_items(db, 0);
+	}
+}
+
 
 void add_goods(tree_t *db)
 {
@@ -320,37 +405,10 @@ void add_goods(tree_t *db)
     }
 }
     
-  
-
-
-
-list_t *list_of_item(tree_t *db)
-{
-  list_t *item_list = list_of_data(db);
-  return item_list;
-}
-
-
-
-void display_goods(tree_t *db);
-
 
 int main()
 {
   tree_t *db = tree_new();
-  /*
-  storage_t *st1 = make_storage("A23", 5);
-  storage_t *st2 = make_storage("D10", 1);
-  storage_t *st3 = make_storage("B23", 2);
-  storage_t *st4 = make_storage("C23", 1);
-  storage_t *st5 = make_storage("F23", 3);
-
-  tree_insert(db, "apple", st1);
-  tree_insert(db, "honey", st2);
-  tree_insert(db, "cola", st3);
-  tree_insert(db, "cow", st4);
-  tree_insert(db, "pig", st5);
-  */
 
   item_t *item1 = item_on_shelf("apple", "red", 4550, "A23", 2);
   item_t *item2 = item_on_shelf("bulle", "sugar high", 5550, "B21", 1);
@@ -365,6 +423,18 @@ int main()
   item_t *item10 = item_on_shelf("hallon", "sour", 2457, "P21", 3);
   item_t *item11 = item_on_shelf("zebra", "sabanah", 3120, "G21", 4);
   item_t *item12 = item_on_shelf("sparv", "bird", 3120, "W21", 4);
+
+  item_t *item13 = item_on_shelf("lejon", "hane", 1234, "Z90", 5);
+  item_t *item14 = item_on_shelf("tiger", "hona", 1234, "N90", 5);
+  item_t *item15 = item_on_shelf("glas", "putsad", 1234, "E90", 5);
+  item_t *item16 = item_on_shelf("glass", "mjuk", 1234, "O90", 5);
+  item_t *item17 = item_on_shelf("mobil", "apple", 1234, "K90", 5);
+  item_t *item18 = item_on_shelf("anka", "Kalle", 1234, "U90", 5);
+  item_t *item19 = item_on_shelf("goose", "hud", 1234, "B90", 5);
+  item_t *item20 = item_on_shelf("little monkey", "crazy", 1234, "X90", 5);
+  item_t *item21 = item_on_shelf("kaffe", "arabica", 1234, "S90", 5);
+  item_t *item22 = item_on_shelf("jabba the hutt", "tjockis", 1234, "T90", 5);
+  item_t *item23 = item_on_shelf("hello kitty", "isn't cat", 1234, "F90", 5);
   
   
   tree_insert(db, "apple", item1);
@@ -379,20 +449,35 @@ int main()
   tree_insert(db, "hallon", item10);
   tree_insert(db, "zebra", item11);
   tree_insert(db, "sparv", item12);
+  tree_insert(db, "lejon", item13);
+  tree_insert(db, "tiger", item14);
+  tree_insert(db, "glas", item15);
+  tree_insert(db, "glass", item16);
+  tree_insert(db, "mobil", item17);
+  tree_insert(db, "anka", item18);
+  tree_insert(db, "goose", item19);
+  tree_insert(db, "little monkey", item20);
+  tree_insert(db, "kaffe", item21);
+  tree_insert(db, "jabba the hutt", item22);
+  tree_insert(db, "hello kitty", item23);
+ 
+ 
   
-  
+  // void *itemshow = item_spec(db, "hallon");
+  //print_item(itemshow);
 
-  int t_size = tree_size(db);
-  printf("tree size is %d\n", t_size);
   
-  
-  void *itemshow = item_spec(db, "hallon");
-  print_item(itemshow);
+  // add_goods(db);
 
-  
-  add_goods(db);
-  
+  //index = 1 
+  //int tell = twenty_items(db, 4);  
+  //printf("%d\n", tell);
 
+
+  //int ja = show_page_of_items(db, 4);
+  //printf("%d\n", ja);
+
+  list_items(db);
   // char *ans =  answer_to_shelf_question(db);
   //printf("%s\n", ans);
 
