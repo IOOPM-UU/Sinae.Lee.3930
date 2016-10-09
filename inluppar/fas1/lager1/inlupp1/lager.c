@@ -404,7 +404,59 @@ void add_goods(tree_t *db)
       // event_loop
     }
 }
-    
+
+void edit_menu_loop(item_t *item)
+{
+  char meny_key;
+  char y_n_key;
+  item_t *edited_item;
+  do
+    {
+      meny_key = ask_question_edit_menu("\nWhat do you wish to edit?");
+      
+	  if(meny_key == 'N')
+        {
+		  edited_item = edit_item_name(item);
+		  y_n_key = ask_question_yes_no("\nDo you wish to continue edit item?");
+		  if (y_n_key == 'Y') {edit_item_name(edited_item);}
+		  if(y_n_key == 'N') return;
+        }
+		
+      else if(meny_key == 'D')
+        {
+          edited_item = edit_item_desc(item);
+		  y_n_key = ask_question_yes_no("\nDo you wish to continue edit item?");
+		  if (y_n_key == 'Y') {edit_item_desc(edited_item);}
+		  if(y_n_key == 'N') return;
+        }
+		
+      else if(meny_key == 'P')
+        {
+          edited_item = edit_item_price(item);
+		  y_n_key = ask_question_yes_no("\nDo you wish to continue edit item?");
+		  if (y_n_key == 'Y') {edit_item_price(edited_item);}
+		  if(y_n_key == 'N') return;
+        }
+		
+      else if(meny_key == 'S')
+        {
+          edited_item = edit_item_shelf(item);
+		  y_n_key = ask_question_yes_no("\nDo you wish to continue edit item?");
+		  if (y_n_key == 'Y') {edit_item_shelf(edited_item);}
+		  if(y_n_key == 'N') return;
+        }
+		
+      else if(meny_key == 'A')
+        {
+          edited_item = edit_item_amount(item);
+		  y_n_key = ask_question_yes_no("\nDo you wish to continue edit item?");
+		  if (y_n_key == 'Y') {edit_item_name(edited_item);}
+		  if(y_n_key == 'N') return;
+        }
+    }
+  while(meny_key != 'B');  // back	
+}
+
 
 int main()
 {
@@ -469,17 +521,9 @@ int main()
   
   // add_goods(db);
 
-  //index = 1 
-  //int tell = twenty_items(db, 4);  
-  //printf("%d\n", tell);
-
-
-  //int ja = show_page_of_items(db, 4);
-  //printf("%d\n", ja);
-
   list_items(db);
   // char *ans =  answer_to_shelf_question(db);
   //printf("%s\n", ans);
-
+  edit_menu_loop(item20);
   
 }
