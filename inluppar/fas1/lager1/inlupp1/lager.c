@@ -291,45 +291,88 @@ void add_goods(tree_t *db)
   printf("----------------------\n");
 
   char *name = ask_question_string("Enter a name: \n");
-  char *shelf_input = ask_question_shelf("Enter shelf nr: \n");
+  //char *shelf_input = ask_question_shelf("Enter shelf nr: \n");
 
   bool name_exist = is_item_in_db(db, name);
-  bool shelf_exist = is_shelf_taken(db, shelf_input);
+  // bool shelf_exist = is_shelf_taken(db, shelf_input);
   
-  if (name_exist == false && shelf_exist == false)
+  if (name_exist == false)
     {
-      char *description = ask_question_string("Description: \n");
-      int price= ask_question_int("Price: \n");
-      int amount = ask_question_int("Amount: \n");
-
-      item_t *item = item_on_shelf(name, description, price, shelf_input, amount);
-      print_item(item);
-      
-      char *answer_to_choice = ask_question_string("Do you want add the item?\n"
-                                                   "[Y]es\n"
-                                                   "[N]o\n"
-                                                   "[E]dit\n");
-      if (answer_to_choice[0] == 'Y' || answer_to_choice[0] == 'y')
+      char *shelf_input = ask_question_shelf("Enter shelf nr: \n");
+      if (is_shelf_taken(db, shelf_input) == false)
         {
-          tree_insert(db, name, item);
-          //event_loop
-        }
+          char *description = ask_question_string("Description: \n");
+          int price= ask_question_int("Price: \n");
+          int amount = ask_question_int("Amount: \n");
+
+          item_t *item = item_on_shelf(name, description, price, shelf_input, amount);
+          print_item(item);
       
-      if (answer_to_choice[0] == 'N' || answer_to_choice[0] == 'n')
-        {
-          free(item);
-          //event_loop
+          char *answer_to_choice = ask_question_string("Do you want add the item?\n"
+                                                       "[Y]es\n"
+                                                       "[N]o\n"
+                                                       "[E]dit\n");
+          if (answer_to_choice[0] == 'Y' || answer_to_choice[0] == 'y')
+            {
+              tree_insert(db, name, item);
+              //event_loop
+            }
+          
+          if (answer_to_choice[0] == 'N' || answer_to_choice[0] == 'n')
+            {
+              free(item);
+              //event_loop
+            }
+
+          //  if (answer_to_choice[0] == 'E' || answer_to_choice[0] == 'e')
+          // edit_item();
+          // event_loop()  
         }
 
-      //  if (answer_to_choice[0] == 'E' || answer_to_choice[0] == 'e')
-      // edit_item();
-      // event_loop()  
+      else
+        {
+          char *shelf = ask_question_shelf("enter new\n");
+          while(is_shelf_taken(db, shelf) == true)  // is_shelf_taken(db, shelf_input) == true
+            {
+              printf("shelf is taken\n");
+              shelf = ask_question_shelf("enter new\n");
+            }
+
+          char *description = ask_question_string("Description: \n");
+          int price= ask_question_int("Price: \n");
+          int amount = ask_question_int("Amount: \n");
+
+          item_t *item = item_on_shelf(name, description, price, shelf_input, amount);
+          print_item(item);
+
+          char *answer_to_choice = ask_question_string("Do you want add the item?\n"
+                                                       "[Y]es\n"
+                                                       "[N]o\n"
+                                                       "[E]dit\n");
+          if (answer_to_choice[0] == 'Y' || answer_to_choice[0] == 'y')
+            {
+              tree_insert(db, name, item);
+              //event_loop
+            }
+          
+          if (answer_to_choice[0] == 'N' || answer_to_choice[0] == 'n')
+            {
+              free(item);
+              //event_loop
+            }
+
+          //  if (answer_to_choice[0] == 'E' || answer_to_choice[0] == 'e')
+          // edit_item();
+          // event_loop()  
+          
+        }
     }
   //if item already exist in db men inte på "shelf_input"
-  if(name_exist == true && shelf_exist == false)
+  if(name_exist == true)
     {
       printf("%s already exsits. Please read the following information about the item.\n", name);
-      print_item(item_spec(db, name));
+      item_t *existing_item = item_spec(db, name);
+      print_item(existing_item);
       char *answer = ask_question_string("Do you want to put the item on the same shelf?\n"
                                          "[Y]\n"
                                          "[N]o\n");
@@ -363,48 +406,76 @@ void add_goods(tree_t *db)
 
       if (answer[0] == 'N' || answer[0] == 'n')
         {
-          char *description = ask_question_string("Description: \n");
-          int price = ask_question_int("Price: \n");
+          char *shelf = ask_question_shelf("Choose a shelf\n");
+          if (is_shelf_taken(db, shelf) == false)
+            {
+              char *description = ask_question_string("Description: \n");
+              int price = ask_question_int("Price: \n");
+              int amount = ask_question_int("Amount: \n");
+          
+              item_t *item = item_on_shelf(name, description, price, shelf, amount);
+              print_item(item);
+          
+              char *answer = ask_question_string("Do you want add the item?\n"
+                                                 "[Y]es\n"
+                                                 "[N]o\n"
+                                                 "[E]dit\n");
+              if (answer[0] == 'Y' || answer[0] == 'y')
+                {
+                  tree_insert(db, name, item);
+                  //event_loop
+                }
+              
+              if (answer[0] == 'N' || answer[0] == 'n')
+                {
+                  free(item);
+                  //event_loop
+                }
+            
+              //  if (answer_to_choice[0] == 'E' || answer_to_choice[0] == 'e')
+            }
+
+          else // shelf is taken
+            {
+              char *shelf = ask_question_shelf("enter new\n");
+              while(is_shelf_taken(db, shelf) == true)  // is_shelf_taken(db, shelf_input) == true
+                {
+                  printf("shelf is taken\n");
+                  shelf = ask_question_shelf("enter new\n");
+                }
+
+              char *description = ask_question_string("Description: \n");
+          int price= ask_question_int("Price: \n");
           int amount = ask_question_int("Amount: \n");
-          
-          item_t *item = item_on_shelf(name, description, price, shelf_input, amount);
+
+          item_t *item = item_on_shelf(name, description, price, shelf, amount);
           print_item(item);
-          
-          char *answer = ask_question_string("Do you want add the item?\n"
-                                             "[Y]es\n"
-                                             "[N]o\n"
-                                             "[E]dit\n");
-          if (answer[0] == 'Y' || answer[0] == 'y')
+
+          char *answer_to_choice = ask_question_string("Do you want add the item?\n"
+                                                       "[Y]es\n"
+                                                       "[N]o\n"
+                                                       "[E]dit\n");
+          if (answer_to_choice[0] == 'Y' || answer_to_choice[0] == 'y')
             {
               tree_insert(db, name, item);
               //event_loop
             }
           
-          if (answer[0] == 'N' || answer[0] == 'n')
+          if (answer_to_choice[0] == 'N' || answer_to_choice[0] == 'n')
             {
               free(item);
               //event_loop
             }
-              
+
           //  if (answer_to_choice[0] == 'E' || answer_to_choice[0] == 'e')
-        } 
-    }
+          // edit_item();
+          // event_loop()  
 
-  if (name_exist == false && shelf_exist == true)
-    {
-      printf("There isn't %s but %s is taken\n", name, shelf_input);
-      printf("Go to add_goods again\n");
-      add_goods(db);
-    }
-
-  if (name_exist == true && shelf_exist == true)
-    {
-      printf("There is already %s and %s is already taken\n", name, shelf_input);
-      printf("Go to the menu \n");
-      // event_loop
+              
+            } 
+        }
     }
 }
-
 void edit_menu_loop(item_t *item)
 {
   char meny_key;
@@ -519,11 +590,11 @@ int main()
   //print_item(itemshow);
 
   
-  // add_goods(db);
+   add_goods(db);
 
-  list_items(db);
+  // list_items(db);
   // char *ans =  answer_to_shelf_question(db);
   //printf("%s\n", ans);
-  edit_menu_loop(item20);
+   //  edit_menu_loop(item20);
   
 }
