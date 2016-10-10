@@ -555,7 +555,7 @@ int main()
   item_t *item8 = item_on_shelf("wolf", "animal", 5550, "T21", 1);
   item_t *item9 = item_on_shelf("dog", "voff", 3000, "M21", 1);
   item_t *item10 = item_on_shelf("hallon", "sour", 2457, "P21", 3);
-  item_t *item11 = item_on_shelf("zebra", "sabanah", 3120, "G21", 4);
+  item_t *item11 = item_on_shelf("zebra", "savannah", 3120, "G21", 4);
   item_t *item12 = item_on_shelf("sparv", "bird", 3120, "W21", 4);
 
   item_t *item13 = item_on_shelf("lejon", "hane", 1234, "Z90", 5);
