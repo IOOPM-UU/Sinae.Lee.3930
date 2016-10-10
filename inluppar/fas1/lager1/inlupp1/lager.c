@@ -58,7 +58,8 @@ bool is_shelf_taken(tree_t *db, char *shelf)
       temp = list_get(shelf_list, i);
       if (strcmp(temp, shelf) == 0)
         {
-          printf("%s is already taken\n", shelf);
+          printf("\n"
+                 "%s is already taken\n", shelf);
           return true;
         }
     }
@@ -298,7 +299,7 @@ void add_goods(tree_t *db)
   
   if (name_exist == false)
     {
-      char *shelf_input = ask_question_shelf("Enter shelf nr: \n");
+      char *shelf_input = ask_question_shelf("Enter a shelf nr: \n");
       if (is_shelf_taken(db, shelf_input) == false)
         {
           char *description = ask_question_string("Description: \n");
@@ -308,7 +309,8 @@ void add_goods(tree_t *db)
           item_t *item = item_on_shelf(name, description, price, shelf_input, amount);
           print_item(item);
       
-          char *answer_to_choice = ask_question_string("Do you want add the item?\n"
+          char *answer_to_choice = ask_question_string("\n"
+                                                       "Do you want add the item?\n"
                                                        "[Y]es\n"
                                                        "[N]o\n"
                                                        "[E]dit\n");
@@ -329,13 +331,14 @@ void add_goods(tree_t *db)
           // event_loop()  
         }
 
-      else
+      else // is_shelf_taken(db, shelf_input) == true
         {
-          char *shelf = ask_question_shelf("enter new\n");
-          while(is_shelf_taken(db, shelf) == true)  // is_shelf_taken(db, shelf_input) == true
+          char *shelf = ask_question_shelf("\n"
+                                           "Choose another shelf\n");
+          while(is_shelf_taken(db, shelf) == true) 
             {
-              printf("shelf is taken\n");
-              shelf = ask_question_shelf("enter new\n");
+              shelf = ask_question_shelf("\n"
+                                         "Please choose another shelf\n");
             }
 
           char *description = ask_question_string("Description: \n");
@@ -345,7 +348,8 @@ void add_goods(tree_t *db)
           item_t *item = item_on_shelf(name, description, price, shelf_input, amount);
           print_item(item);
 
-          char *answer_to_choice = ask_question_string("Do you want add the item?\n"
+          char *answer_to_choice = ask_question_string("\n"
+                                                       "Do you want add the item?\n"
                                                        "[Y]es\n"
                                                        "[N]o\n"
                                                        "[E]dit\n");
@@ -370,10 +374,12 @@ void add_goods(tree_t *db)
   //if item already exist in db men inte på "shelf_input"
   if(name_exist == true)
     {
-      printf("%s already exsits. Please read the following information about the item.\n", name);
+      printf("\n"
+             "%s already exsits. Please read the following information about the item.\n", name);
       item_t *existing_item = item_spec(db, name);
       print_item(existing_item);
-      char *answer = ask_question_string("Do you want to put the item on the same shelf?\n"
+      char *answer = ask_question_string("\n"
+                                         "Do you want to put the item on the same shelf?\n"
                                          "[Y]\n"
                                          "[N]o\n");
       if (answer[0] == 'Y' || answer[0] == 'y')
@@ -381,7 +387,8 @@ void add_goods(tree_t *db)
           void *item = item_spec(db, name);
           increase_item_amount(item);
           print_item(item);
-          char *answer_to_choice = ask_question_string("Do you want add the item?\n"
+          char *answer_to_choice = ask_question_string("\n"
+                                                       "Do you want add the item?\n"
                                                        "[Y]es\n"
                                                        "[N]o\n"
                                                        "[E]dit\n");
@@ -406,7 +413,8 @@ void add_goods(tree_t *db)
 
       if (answer[0] == 'N' || answer[0] == 'n')
         {
-          char *shelf = ask_question_shelf("Choose a shelf\n");
+          char *shelf = ask_question_shelf("\n"
+                                           "Entehr a shelf\n");
           if (is_shelf_taken(db, shelf) == false)
             {
               char *description = ask_question_string("Description: \n");
@@ -416,7 +424,8 @@ void add_goods(tree_t *db)
               item_t *item = item_on_shelf(name, description, price, shelf, amount);
               print_item(item);
           
-              char *answer = ask_question_string("Do you want add the item?\n"
+              char *answer = ask_question_string("\n"
+                                                 "Do you want add the item?\n"
                                                  "[Y]es\n"
                                                  "[N]o\n"
                                                  "[E]dit\n");
@@ -437,11 +446,12 @@ void add_goods(tree_t *db)
 
           else // shelf is taken
             {
-              char *shelf = ask_question_shelf("enter new\n");
+              char *shelf = ask_question_shelf("\n"
+                                               "Please choose another shelf\n");
               while(is_shelf_taken(db, shelf) == true)  // is_shelf_taken(db, shelf_input) == true
                 {
-                  printf("shelf is taken\n");
-                  shelf = ask_question_shelf("enter new\n");
+                  shelf = ask_question_shelf("\n"
+                                             "Please choose another shelf\n");
                 }
 
               char *description = ask_question_string("Description: \n");
@@ -451,7 +461,8 @@ void add_goods(tree_t *db)
           item_t *item = item_on_shelf(name, description, price, shelf, amount);
           print_item(item);
 
-          char *answer_to_choice = ask_question_string("Do you want add the item?\n"
+          char *answer_to_choice = ask_question_string("\n"
+                                                       "Do you want add the item?\n"
                                                        "[Y]es\n"
                                                        "[N]o\n"
                                                        "[E]dit\n");
