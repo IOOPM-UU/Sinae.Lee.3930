@@ -80,7 +80,6 @@ int item_list_length(item_t *item)
 {
   return list_length(item->list);
 }
-
   
 char *get_shelf_nr(item_t *item, int index)
 {
@@ -95,7 +94,6 @@ int *get_storage_amount(item_t *item, int index)
   storage_t *storage = list_get(list, index);
   return &storage->amount;
 }
-
 
 char *get_description (item_t *item)
 {
@@ -134,7 +132,6 @@ list_t *get_item_list(item_t *item)
 {
   return item->list;
 }
-
 
 //make item  with shelf location
 item_t *item_on_shelf(char *name, char *desc, int price, char *shelf, int amount)
@@ -183,7 +180,8 @@ void print_item(item_t *item)
   printf("\n"
          "Name: %s\n"
          "Description: %s\n"
-         "Price: %d.%d kr\n",
+         "Price: %d.%d kr\n"
+         "Shelf:\t\tAmount:\n",
          name, description, q, r);
   print_list_storage(item->list);
 }
@@ -196,7 +194,7 @@ void print_list_storage(list_t *list)
     {
       storage_t *storage = list_get(list, i);
 
-      printf("%d. Shelf %s, Amount %d\n", i+1, storage->shelf, storage->amount);
+      printf("%d. %s\t\t%d\n", i+1, storage->shelf, storage->amount);
     }
 }
 
@@ -290,17 +288,18 @@ item_t *edit_item_amount(item_t *item)
   return item;
 }
 
-// increase item amount and display item
-item_t *increase_item_amount(item_t *item, int index)
+void  print_current_amount(item_t *item, int index)
 {
-  
-    item_t *old_item = item;
-    int *old_amount = get_storage_amount(old_item, index); 
-    printf("\nCurrent amount: %d\n", *old_amount);
-    printf("--------------------------------------------------------\n");
-    //ask for new amount
-    int add_amount = ask_question_int("Enter amount: ");
-    //add amount
+   int *old_amount = get_storage_amount(item, index); 
+   printf("\nCurrent amount: %d\n", *old_amount);
+   printf("--------------------------------------------------------\n");
+}
+
+// increase item amount and display item
+item_t *increase_item_amount(item_t *item, int index, int add_amount)
+{
+    int *old_amount = get_storage_amount(item, index); 
+    
     *old_amount = *old_amount + add_amount;
     int new_amount = *old_amount;
     printf("\nNew amount is: %d\n", new_amount);

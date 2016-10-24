@@ -30,21 +30,6 @@ action_t *action_new(void)
   return action;
 }
 
-
-void action_edit(action_t *action, item_t *item)
-{
-  if(action->type == EDIT)
-    {
-      item_free(action->old);
-      action->edited = NULL;
-    }
-  action->type = EDIT;
-  action->edited = item;
-  action->old = copy_item(item);
-  return;
-}
-
-
 void action_add(action_t *action, char *name)
 {
   if (action->type == ADD)
@@ -80,15 +65,11 @@ list_t *extract_shelves(tree_t *db)
   return list_of_shelves;
 }
 
-
-bool name_check(tree_t *db, char *new_name);
-
 int amount_of_pages(int length)
 {
   int max_elements = length - 1;
   int page = (max_elements - (max_elements % 20)) / 20;
-  return page;
-	
+  return page;	
 }
 
 //visar innehållet av item
@@ -431,10 +412,8 @@ void add_goods(tree_t *db)
   printf("----------------------\n");
 
   char *name = ask_question_string("Enter a name: \n");
-  //char *shelf_input = ask_question_shelf("Enter shelf nr: \n");
-
+  
   bool name_exist = is_item_in_db(db, name);
-  // bool shelf_exist = is_shelf_taken(db, shelf_input);
   
   if (name_exist == false)
     {
@@ -456,18 +435,12 @@ void add_goods(tree_t *db)
           if (answer_to_choice[0] == 'Y' || answer_to_choice[0] == 'y')
             {
               tree_insert(db, name, item);
-              //event_loop
             }
           
           if (answer_to_choice[0] == 'N' || answer_to_choice[0] == 'n')
             {
               free(item);
-              //event_loop
             }
-
-          //  if (answer_to_choice[0] == 'E' || answer_to_choice[0] == 'e')
-          // edit_item();
-          // event_loop()  
         }
 
       else // is_shelf_taken(db, shelf_input) == true
@@ -494,18 +467,12 @@ void add_goods(tree_t *db)
           if (answer_to_choice[0] == 'Y' || answer_to_choice[0] == 'y')
             {
               tree_insert(db, name, item);
-              //event_loop
             }
           
           if (answer_to_choice[0] == 'N' || answer_to_choice[0] == 'n')
             {
               free(item);
-              //event_loop
             }
-
-          //  if (answer_to_choice[0] == 'E' || answer_to_choice[0] == 'e')
-          // edit_item();
-          // event_loop()  
           
         }
     }
@@ -516,19 +483,19 @@ void add_goods(tree_t *db)
              "%s already exsits. Please read the following information about the item.\n", name);
       item_t *existing_item = item_spec(db, name);
       print_item(existing_item);
-      int list_index = ask_question_int ("\n"
-                                         "Which shelf do you want to change amount?\n");
- 
+      
       char *answer = ask_question_string("\n"
-                                         "Are you sure?\n"
-                                         "[Y]\n"
+                                         "Do you want to use one of these shelves?\n"
+                                         "[Y]es\n"
                                          "[N]o\n");
 
       if (answer[0] == 'Y' || answer[0] == 'y')
         {
+          int list_index = ask_question_int ("\n"
+                                         "Which shelf do you want to change?\n");
           void *item = item_spec(db, name);
-          increase_item_amount(item, list_index-1);
-          print_item(item);
+          print_current_amount(item, list_index-1);
+          int add_amount = ask_question_int("Enter amount:");
           char *answer_to_choice = ask_question_string("\n"
                                                        "Do you want add the item?\n"
                                                        "[Y]es\n"
@@ -539,6 +506,8 @@ void add_goods(tree_t *db)
 
           if (answer_to_choice[0] == 'Y' || answer_to_choice[0] == 'y')
             {
+              increase_item_amount(item, list_index-1, add_amount);
+              print_item(item);
               tree_insert(db, name, item);
               //event_loop
             }

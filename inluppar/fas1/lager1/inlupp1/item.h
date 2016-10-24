@@ -59,7 +59,9 @@ item_t *edit_item_shelf(tree_t *tree, item_t *item);
 
 item_t *edit_item_amount(item_t *item);
 
-item_t *increase_item_amount(item_t *item, int index);
+void  print_current_amount(item_t *item, int index);
+
+item_t *increase_item_amount(item_t *item, int index, int add_amount);
 
 char *get_item_shelf(item_t *item);
 
