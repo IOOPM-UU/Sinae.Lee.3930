@@ -143,7 +143,6 @@ node_t *insert_node (node_t *node, char *key, void *data)
     }
   return node;
 }
-//TODO tree_insert(tree_t *tree, TODO);
 
 bool tree_insert(tree_t *tree, char *key, void *data)
 {
@@ -188,21 +187,50 @@ void *get_node_data(node_t *node)
     return NULL;
 }
 
-
-char *get_shelf_node(node_t *node)
+char *get_shelf_node(node_t *node, int index)
 {
   char *shelf;
   item_t *item = get_node_data(node);
-  return shelf = get_shelf_nr(item);
+  
+  return shelf = get_shelf_nr(item, index);
+}
+
+void node_data_list(node_t *node, list_t *list)
+{
+  if (node == NULL) {return;}
+  node_data_list(node->left, list);
+  void *data_info = get_node_data(node);
+  list_append(list, data_info);
+  node_data_list(node->right, list);
+}
+
+//för att gör en lista av alla data(item)  
+list_t *list_of_data(tree_t *tree)
+{
+  list_t *list_for_data = list_new();
+  if (tree == NULL)
+    {
+      printf("Tree is empty\n");
+    }
+
+  node_data_list(tree->root, list_for_data);
+  return list_for_data;
 }
 
 void node_shelf_list(node_t *node, list_t *list)
 {
   if (node == NULL) {return;}
   node_shelf_list(node->left, list);
-  char *shelf = get_shelf_node(node);
-  list_append(list, shelf);
-  node_shelf_list(node->right, list);
+
+  item_t *item = get_node_data(node);
+  int length = item_list_length(item);
+  for( int index = 0; index<length; ++index)
+    {
+      char *shelf = get_shelf_node(node, index);
+      list_append(list, shelf);
+      
+    }
+   node_shelf_list(node->right, list);
 }
   
 list_t *list_node_shelf(tree_t *tree) //en lista med alla upptagna hyllor
@@ -216,6 +244,32 @@ list_t *list_node_shelf(tree_t *tree) //en lista med alla upptagna hyllor
   return shelves;
 }
 
+storage_t *get_storage_node(node_t *node)
+{
+    storage_t *storage;
+    item_t *item = get_node_data(node);
+    return storage = get_storage(item);
+}
+
+void node_storage_list(node_t *node, list_t *list)
+{
+    if(node == NULL){return;}
+    node_storage_list(node->left, list);
+    storage_t *storage = get_storage_node(node);
+    list_append(list, storage);
+    node_storage_list(node->right, list);
+}
+
+list_t *list_tree_storage(tree_t *tree)
+{
+    list_t *storage = list_new();
+    if (tree == NULL)
+    {
+        printf("\n The database is empty\n");
+    }
+    node_storage_list(tree->root, storage);
+    return storage;
+}
 
 bool is_key_in_subtree(node_t *node, char *key)
 {
@@ -366,49 +420,56 @@ void *search_data_in_tree(tree_t *tree, char *key)
   return search_data_in_subtree(tree->root, key);
 }
 
-
-
-
-/*
-int main()
+bool is_leaf_node(node_t *node)
 {
-
-
-   
-  tree_t *tree1;
-  tree1 = tree_new();
-
-  
-
-  tree_t *tree2 = tree_insert2(tree1, "apple", "A23");
-  tree_t *tree3 = tree_insert2(tree2, "hola", "A24");
-  tree_t *tree4 = tree_insert2(tree3, "cola", "c25");
-  tree_t *tree5 = tree_insert2(tree4, "dola", "d27");
-  
-  
-  print_preorder(tree5);
-  
-  puts("-----------------");
-  
-  print_inorder(tree5);
-  
-  puts("-----------------");
-  
-  print_postorder(tree5);
-  
-  puts("-----------------");
-  
-  char *k1 = search_data_in_tree(tree5, "dola");
-  printf("dola is on %s\n", k1);
-  
-  
-  char *k2 = search_data_in_tree(tree5, "hola");
-  printf("hola is on %s\n", k2);
-  
-  int size = tree_size(tree4);
-  printf("%d\n", size);
-   
+  if (node != NULL)
+    {
+      if (node->left == NULL && node->right == NULL)
+        {
+          return true;
+        }
+    }
+  return false;
 }
-*/
 
+bool sub_tree_remove_leaf(node_t **node, char *key)
+{
+  if (*node == NULL)
+    {
+      return false;
+    }
+  if (is_leaf_node(*node) == true)
+    {
+      if (strcmp(key, (*node)->key) == 0)
+        {
+          free(*node);
+          *node = NULL;
+          return true;
+        }
+      else
+        {
+          return false;
+        }
+    }
+  if (strcmp(key, (*node)->key) < 0)
+    {
+      return sub_tree_remove_leaf(&((*node)->left), key);
+    }
+  else if (strcmp(key, (*node)->key) > 0)
+    {
+      return sub_tree_remove_leaf(&((*node)->right), key);
+    }
+  else
+    {
+      return false;
+    }
+}
 
+bool tree_remove_leaf(tree_t *tree, char *key)
+{
+  if (tree == NULL)
+    {
+      return false;
+    }
+  return sub_tree_remove_leaf(&(tree->root), key);
+}

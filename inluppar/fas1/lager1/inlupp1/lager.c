@@ -14,14 +14,47 @@ typedef struct action action_t;
 
 struct action
 {
-  enum { NOTHING, ADD, REMOVE, EDIT } TYPE;
-  item_t *added;    //add
-  item_t *edited;    // edit
-  item_t *old;   //edit
-  //item_t *removed;
-  list_t *origin_list;
-  bool exist;
+  enum { NOTHING, ADD, REMOVE, EDIT } type;
+  char *add;
+  item_t *edited;    
+  item_t *old;   
 };
+
+action_t *action_new(void)
+{
+  action_t *action = calloc(1, sizeof(action_t));
+  if (action)
+    {
+      action->type = NOTHING;
+    }
+  return action;
+}
+
+
+void action_edit(action_t *action, item_t *item)
+{
+  if(action->type == EDIT)
+    {
+      item_free(action->old);
+      action->edited = NULL;
+    }
+  action->type = EDIT;
+  action->edited = item;
+  action->old = copy_item(item);
+  return;
+}
+
+
+void action_add(action_t *action, char *name)
+{
+  if (action->type == ADD)
+    {
+      free(action->add);
+    }
+  action->type = ADD;
+  action->add = strdup(name);
+  return;
+}
 
 bool is_item_in_db(tree_t *db, char *name) // name som vi matar in  
 {
@@ -47,7 +80,331 @@ list_t *extract_shelves(tree_t *db)
   return list_of_shelves;
 }
 
-bool is_shelf_taken(tree_t *db, char *shelf)
+
+bool name_check(tree_t *db, char *new_name);
+
+int amount_of_pages(int length)
+{
+  int max_elements = length - 1;
+  int page = (max_elements - (max_elements % 20)) / 20;
+  return page;
+	
+}
+
+//visar innehållet av item
+void *item_spec(tree_t *db, char *name)
+{
+  return search_data_in_tree(db, name);
+}
+
+item_t *display_item(tree_t *tree, list_t *keys, int item_index) 
+{
+  char *item_name = (char *)list_get(keys, item_index);
+  
+  void *item_show = item_spec(tree, item_name);
+  printf("\n==== Item display ====\n\n");
+  print_item(item_show);
+  printf("\n\n\n\n\n");
+  return item_show;
+}
+
+item_t *get_item(tree_t *tree, list_t *keys, int item_index)
+{
+  char *item_name = (char *)list_get(keys, item_index);
+  item_t *edit_item = item_spec(tree, item_name);
+  return edit_item;
+}
+
+bool edit_menu_loop(tree_t *db, item_t *item)
+{
+  char meny_key;
+  char y_n_key;
+  item_t *edited_item;
+  
+  //list_t *shelves_taken = list_node_shelf(db);
+  
+  //do
+    //{
+
+      meny_key = ask_question_edit_menu("\nWhat do you wish to edit?");
+      
+	  if(meny_key == 'N')
+        {
+		  /*edited_item = edit_item_name(item);
+		  y_n_key = ask_question_yes_no("\nDo you wish to continue edit item?");
+		  if (y_n_key == 'Y')
+		  {
+			  edit_menu_loop(db, edited_item);
+			  return true;
+		  }
+		  if(y_n_key == 'N') return false;*/
+		  printf("\n!!!! NOT YET IMPLEMENTED !!!!\n");
+		  return false;
+        }
+		
+      else if(meny_key == 'D')
+        {
+          edited_item = edit_item_desc(item);
+		  y_n_key = ask_question_yes_no("\nDo you wish to continue edit item?");
+		  if (y_n_key == 'Y')
+		  {
+			  edit_menu_loop(db, edited_item);
+			  return true;
+		  }
+		  if(y_n_key == 'N') return false;
+        }
+		
+      else if(meny_key == 'P')
+        {
+          edited_item = edit_item_price(item);
+		  y_n_key = ask_question_yes_no("\nDo you wish to continue edit item?");
+		  if (y_n_key == 'Y')
+		  {
+			  edit_menu_loop(db, edited_item);
+			  return true;
+		  }
+		  if(y_n_key == 'N') return false;
+        }
+		
+      else if(meny_key == 'S')
+        {
+          edited_item = edit_item_shelf(db, item);
+		  y_n_key = ask_question_yes_no("\nDo you wish to continue edit item?");
+		  if (y_n_key == 'Y')
+		  {
+			  edit_menu_loop(db, edited_item);
+			  return true;
+		  }
+		  if(y_n_key == 'N') return false;
+        }
+		
+      else if(meny_key == 'A')
+        {
+          edited_item = edit_item_amount(item);
+		  y_n_key = ask_question_yes_no("\nDo you wish to continue edit item?");
+		  if (y_n_key == 'Y')
+		  {
+			  edit_menu_loop(db, edited_item);
+			  return true;
+		  }
+		  if(y_n_key == 'N') return false;
+        }
+	  else if(meny_key == 'B') return false;
+    //}
+  //while(meny_key != 'B');  // back	
+  	if (edit_menu_loop(db, item)) // if true
+	{
+		return true;
+	}
+	return false;
+}
+
+
+
+
+
+bool aux_list_items(tree_t *db, int index, int page) //prints out the keys, in-order
+{
+	//printf("\n\n\n\n\n\n\n\n");
+	printf("\n========= List of items ========\n");
+	
+	list_t *keys = tree_keys(db);
+	int length = list_length(keys);
+	bool show_next;// = show_next_page(length, index);
+	bool show_prev;// = show_prev_page(length, index);
+	int count = 0;// kanske inte behövs, kanske räcker med index % 20
+	//int page = 0;
+	int prev_i = index;
+	int max_pages = amount_of_pages(length) + 1;
+	
+	
+	if (length == 0)
+	{
+		printf("\nThe tree is empty\n");
+		return false;
+	}
+	
+	for (; index < length && count < 20; ++index) // byta ut count < 20 mot index % 20 < 20
+	{
+		char *key = list_get(keys, index);
+		printf("%d.\t%s\n", index % 20 + 1, key);
+		++count;
+	}
+	printf("\nItem's index from %d to %d", prev_i, index - 1);
+	printf("\tYou are on page %d of %d\n", page+1, max_pages);
+	
+	show_next = show_next_page(length, index);
+	show_prev = show_prev_page(length, index);
+	
+	if (length <= 20)
+	{
+		char answer = ask_question_list_menu(show_next, show_prev);
+		if (answer == 'E')
+		{
+			printf("Edit item\n");
+			int item_index = ask_question_index("Which item do you want to edit?", length, page);
+			printf("\n\n");
+			display_item(db, keys, item_index);
+			item_t *edit_item = get_item(db, keys, item_index);
+			
+			edit_menu_loop(db, edit_item);
+			return true;
+		}
+		if (answer == 'D')
+		{
+			int item_index = ask_question_index("Which item do you want to display?", length, page);
+			printf("\n\n");
+			display_item(db, keys, item_index);
+			return true; //eller false för att återgå till menu?
+		}
+		if (answer == 'B')
+		{
+			printf("\n\n\n\n\n\n\n\n");
+			return false;
+		}
+		printf("\nInvalid input 1\n");
+		aux_list_items(db,index - (index % 20), page);
+		return true;
+	}
+	
+	if (length > 20 && index == 20) //there's 21 items or more
+	{
+		char answer = ask_question_list_menu(show_next, show_prev);
+		if (answer == 'N')
+		{
+			aux_list_items(db,index, page+1);
+			return true;
+		}
+		if (answer == 'E')
+		{
+			printf("Edit item\n");
+			int item_index = ask_question_index("Which item do you want to edit?", length, page);
+			printf("\n\n");
+			display_item(db, keys, item_index);
+			item_t *edit_item = get_item(db, keys, item_index);
+			
+			edit_menu_loop(db, edit_item);
+			return true;
+		}
+		if (answer == 'D')
+		{
+			int item_index = ask_question_index("Which item do you want to display?", length, page);
+			printf("\n\n");
+			display_item(db, keys, item_index);
+			return true;
+		}
+		if (answer == 'B')
+		{
+			printf("\n\n\n\n\n\n\n\n");
+			return false;
+		}
+		printf("\nInvalid input 2\n");
+		aux_list_items(db, index - 20, page);
+		return true;
+	}
+	
+	if (length > 20 && index > 20 && index % 20 == 0)
+	{
+
+		char answer = ask_question_list_menu(show_next, show_prev);
+		if( answer == 'N')
+		{
+			aux_list_items(db,index,page+1);
+			return true;
+		}
+		if (answer == 'P')
+		{
+			aux_list_items(db, index-40,page-1);
+			return true;
+		}
+		if (answer == 'E')
+		{
+			printf("Edit item\n");
+			int item_index = ask_question_index("Which item do you want to edit?", length, page);
+			printf("\n\n");
+			display_item(db, keys, item_index);
+			item_t *edit_item = get_item(db, keys, item_index);
+			
+			edit_menu_loop(db, edit_item);
+			return true;
+		}
+		if (answer == 'D')
+		{
+			int item_index = ask_question_index("Which item do you want to display?", length, page);
+			printf("\n\n");
+			display_item(db, keys, item_index);
+			return true;
+		}
+		if (answer == 'B')
+		{
+			printf("\n\n\n\n\n\n\n\n");
+			return false;
+		}
+		printf("\nInvalid input 3\n");
+		aux_list_items(db, index - 20, page);
+		return true;
+	}
+	
+	if (length > 20 && index > 20 && index % 20 != 0)
+	{
+
+		char answer = ask_question_list_menu(show_next, show_prev);
+		if (answer == 'P')
+		{
+			aux_list_items(db,index - (index%20)-20, page-1);
+			return true;
+		}
+		if (answer == 'E')
+		{
+			printf("Edit item\n");
+			int item_index = ask_question_index("Which item do you want to edit?", length, page);
+			printf("\n\n");
+			display_item(db, keys, item_index);
+			item_t *edit_item = get_item(db, keys, item_index);
+			
+			edit_menu_loop(db, edit_item);
+			return true;
+		}
+		if (answer == 'D')
+		{
+			int item_index = ask_question_index("Which item do you want to display?", length, page);
+			printf("\n\n");
+			display_item(db, keys, item_index);
+			return true;
+		}
+		if (answer == 'B')
+		{
+			printf("\n\n\n\n\n\n\n\n");
+			return false;
+		}
+		printf("\nInvalid input 4\n");
+		aux_list_items(db,index - (index%20), page);
+		return true;
+	}
+	
+	if (aux_list_items(db, index, page)) // if true
+	{
+		return true;
+	}
+	return false;
+}
+
+
+void list_items(tree_t *db)
+{
+  int db_size = tree_size(db);
+  if (db_size == 0)
+    {
+      printf("The database is empty\n");
+    }
+  
+  if(db_size > 0)
+    {
+      aux_list_items(db, 0, 0);
+    }
+}
+
+bool is_shelf_taken_add(tree_t *db, char *shelf)
 {
   char *temp;
   list_t *shelf_list = extract_shelves(db);
@@ -67,224 +424,6 @@ bool is_shelf_taken(tree_t *db, char *shelf)
   return false;
 }
 
-char *answer_to_shelf_question(tree_t *db) 
-{
-  char *input = ask_question_shelf("Enter the shelf:");
-
-  while (is_shelf_taken(db, input) == true)
-    {
-      printf("Please enter another shelf\n");
-      free(input);
-      input =  ask_question_shelf("Enter the shelf:");
-    }
-
-  return input;
-}
-
-//visar innehållet av item
-void *item_spec(tree_t *db, char *name)
-{
-  return search_data_in_tree(db, name);
-}
-
-
-
-
-bool aux_list_items(tree_t *db, int index) //prints out the keys, in-order
-{
-	printf("\n========= List of items ========\n");
-	
-	list_t *keys = tree_keys(db);
-	int length = list_length(keys);
-	bool show_next;// = show_next_page(length, index);
-	bool show_prev;// = show_prev_page(length, index);
-	int count = 0; // kanske inte behövs, kanske räcker med index % 20
-	int prev_i = index;
-       
-	if (length == 0)
-	{
-		printf("\nThe tree is empty\n");
-		return false;
-	}
-	
-	for (; index < length && count < 20; ++index) // byta ut count < 20 mot index % 20 < 20
-	{
-		char *key = list_get(keys, index);
-		printf("%d.\t%s\n", index % 20 + 1, key);
-		++count;
-	}
-	printf("\nItem's index from %d to %d\n", prev_i, index-1);
-	
-	show_next = show_next_page(length, index);
-	show_prev = show_prev_page(length, index);
-	
-	if (length <= 20)
-	{
-          char answer = ask_question_list_menu(show_next, show_prev);
-		if (answer == 'E')
-		{
-			printf("Edit item\n");
-			return true;
-		}
-		if (answer == 'D')
-		{
-                  printf("\n"
-                         "Display item\n");
-                  
-                  int index_nr = ask_question_int("\n"
-                                                  "Please enter the item number\n");
-                  int item_nr = index_nr - 1;
-
-                  char *item_name = strdup((char *)list_get(keys, item_nr));
-
-                  void *item_show = item_spec(db, item_name);
-                  print_item(item_show);
-                  
-                  
-                  return true; //eller false för att återgå till list?
-		}
-		if (answer == 'B')
-		{
-			return false;
-		}
-		printf("\nInvalid input 1\n");
-		aux_list_items(db,index - (index % 20));
-		return true;
-	}
-	
-	if (length > 20 && index == 20) //there's 21 items or more
-	{
-		char answer = ask_question_list_menu(show_next, show_prev);
-		if (answer == 'N')
-		{
-                  aux_list_items(db,index);
-                          
-                  return true;
-		}
-		if (answer == 'E')
-		{
-			printf("Edit item\n");
-			return true;
-		}
-                
-		if (answer == 'D'&& answer != 'N')
-		{
-                  printf("Display item\n");
-
-                  int index_nr = ask_question_int("\n"
-                                                  "Please enter the item number\n");
-                  int item_nr = index_nr -1;
-
-                  char *item_name = strdup((char *)list_get(keys, item_nr));
-
-                  void *item_show = item_spec(db, item_name);
-                  print_item(item_show);
-                  
-                  return true; // eller false
-		}
-
-		if (answer == 'B')
-		{
-			return false;
-		}
-		printf("\nInvalid input 2\n");
-		aux_list_items(db, index - 20);
-		return true;
-	}
-	
-	if (length > 20 && index > 20 && index % 20 == 0)
-	{
-
-		char answer = ask_question_list_menu(show_next, show_prev);
-		if( answer == 'N')
-		{
-			aux_list_items(db,index);
-			return true;
-		}
-		if (answer == 'P')
-		{
-			aux_list_items(db, index-40);
-			return true;
-		}
-		if (answer == 'E')
-		{
-			printf("Edit item 2\n");
-			return true;
-		}
-		if (answer == 'D')
-		{
-                  printf("Display item\n");
-                        
-                  return true; //eller false
-		}
-		if (answer == 'B')
-		{
-			return false;
-		}
-		printf("\nInvalid input 3\n");
-		aux_list_items(db, index - 20);
-		return true;
-	}
-	
-	if (length > 20 && index > 20 && index % 20 != 0)
-	{
-
-		char answer = ask_question_list_menu(show_next, show_prev);
-		if (answer == 'P')
-		{
-			aux_list_items(db,index - (index%20)-20);
-			return true;
-		}
-		if (answer == 'E')
-		{
-			printf("Edit item 3\n");
-			return true;
-		}
-		if (answer == 'D')
-		{
-			printf("Display item\n");
-                        
-                        int index_nr = ask_question_int("\n"
-                                                        "Please enter the item number\n");
-                        int item_nr = index_nr+20-1 ;
-
-                        char *item_name = strdup((char *)list_get(keys, item_nr));
-                        void *item_show = item_spec(db, item_name);
-                        print_item(item_show);
-                  
-			return true; //eller false
-		}
-		if (answer == 'B')
-		{
-			return false;
-		}
-		printf("\nInvalid input 4\n");
-		aux_list_items(db,index - (index%20));
-		return true;
-	}
-	
-	if (aux_list_items(db, index)) // if true
-	{
-		return true;
-	}
-	return false;
-}
-
-void list_items(tree_t *db)
-{
-	int db_size = tree_size(db);
-	if (db_size == 0)
-	{
-		printf("The database is empty\n");
-	}
-	
-	if(db_size > 0)
-	{
-		aux_list_items(db, 0);
-	}
-}
-
-
 void add_goods(tree_t *db)
 {
   printf("----------------------");
@@ -300,7 +439,7 @@ void add_goods(tree_t *db)
   if (name_exist == false)
     {
       char *shelf_input = ask_question_shelf("Enter a shelf nr: \n");
-      if (is_shelf_taken(db, shelf_input) == false)
+      if (is_shelf_taken_add(db, shelf_input) == false)
         {
           char *description = ask_question_string("Description: \n");
           int price= ask_question_int("Price: \n");
@@ -333,14 +472,13 @@ void add_goods(tree_t *db)
 
       else // is_shelf_taken(db, shelf_input) == true
         {
-          char *shelf = ask_question_shelf("\n"
+          shelf_input = ask_question_shelf("\n"
                                            "Choose another shelf\n");
-          while(is_shelf_taken(db, shelf) == true) 
+          while(is_shelf_taken_add(db, shelf_input) == true) 
             {
-              shelf = ask_question_shelf("\n"
+              shelf_input = ask_question_shelf("\n"
                                          "Please choose another shelf\n");
             }
-
           char *description = ask_question_string("Description: \n");
           int price= ask_question_int("Price: \n");
           int amount = ask_question_int("Amount: \n");
@@ -378,14 +516,18 @@ void add_goods(tree_t *db)
              "%s already exsits. Please read the following information about the item.\n", name);
       item_t *existing_item = item_spec(db, name);
       print_item(existing_item);
+      int list_index = ask_question_int ("\n"
+                                         "Which shelf do you want to change amount?\n");
+ 
       char *answer = ask_question_string("\n"
-                                         "Do you want to put the item on the same shelf?\n"
+                                         "Are you sure?\n"
                                          "[Y]\n"
                                          "[N]o\n");
+
       if (answer[0] == 'Y' || answer[0] == 'y')
         {
           void *item = item_spec(db, name);
-          increase_item_amount(item);
+          increase_item_amount(item, list_index-1);
           print_item(item);
           char *answer_to_choice = ask_question_string("\n"
                                                        "Do you want add the item?\n"
@@ -413,16 +555,22 @@ void add_goods(tree_t *db)
 
       if (answer[0] == 'N' || answer[0] == 'n')
         {
+          item_t *current = item_spec(db, name);
+          list_t *item_list = get_item_list(current);
           char *shelf = ask_question_shelf("\n"
-                                           "Entehr a shelf\n");
-          if (is_shelf_taken(db, shelf) == false)
+                                           "Enter a shelf\n");
+          if (is_shelf_taken_add(db, shelf) == false)
             {
-              char *description = ask_question_string("Description: \n");
-              int price = ask_question_int("Price: \n");
+              
+              // char *description = ask_question_string("Description: \n");
+              // int price = ask_question_int("Price: \n");
               int amount = ask_question_int("Amount: \n");
-          
-              item_t *item = item_on_shelf(name, description, price, shelf, amount);
-              print_item(item);
+
+              storage_t *new_storage = make_storage(shelf, amount);
+              list_append(item_list, new_storage);
+              print_list_storage(item_list);
+              
+              
           
               char *answer = ask_question_string("\n"
                                                  "Do you want add the item?\n"
@@ -431,13 +579,13 @@ void add_goods(tree_t *db)
                                                  "[E]dit\n");
               if (answer[0] == 'Y' || answer[0] == 'y')
                 {
-                  tree_insert(db, name, item);
+                  tree_insert(db, name, current);
                   //event_loop
                 }
               
               if (answer[0] == 'N' || answer[0] == 'n')
                 {
-                  free(item);
+                  free(new_storage);
                   //event_loop
                 }
             
@@ -448,7 +596,7 @@ void add_goods(tree_t *db)
             {
               char *shelf = ask_question_shelf("\n"
                                                "Please choose another shelf\n");
-              while(is_shelf_taken(db, shelf) == true)  // is_shelf_taken(db, shelf_input) == true
+              while(is_shelf_taken_add(db, shelf) == true)  // is_shelf_taken(db, shelf_input) == true
                 {
                   shelf = ask_question_shelf("\n"
                                              "Please choose another shelf\n");
@@ -487,57 +635,65 @@ void add_goods(tree_t *db)
         }
     }
 }
-void edit_menu_loop(item_t *item)
+
+
+void undo_action_add(tree_t *db, action_t *action)
+{
+  if (action->type == ADD)
+    {
+
+      bool t = tree_remove_leaf(db, action->add);
+      if(t)
+        {
+          
+          printf("%s is removed\n", action->add);
+        }
+
+      else
+        {
+          printf("Coming soon. We don't have tree_remove\n");
+        }
+      
+    }
+
+  if (action->type == EDIT)
+  return;
+  
+}
+
+void event_loop(tree_t *db)//, action_t *action)
 {
   char meny_key;
-  char y_n_key;
-  item_t *edited_item;
   do
     {
-      meny_key = ask_question_edit_menu("\nWhat do you wish to edit?");
-      
-	  if(meny_key == 'N')
+      meny_key = ask_question_menu();
+	  
+      if(meny_key == 'A')
         {
-		  edited_item = edit_item_name(item);
-		  y_n_key = ask_question_yes_no("\nDo you wish to continue edit item?");
-		  if (y_n_key == 'Y') {edit_item_name(edited_item);}
-		  if(y_n_key == 'N') return;
+			add_goods(db);
+        }
+          //edit_item(db, action);
+		  
+      else if(meny_key == 'L')
+        {
+          list_items(db);  //list_db
+        }
+		  
+      else if(meny_key == 'U')
+        {
+			printf("\n!!!! NOT YET IMPLEMENTED !!!!\n");
+          //undo(action);
         }
 		
-      else if(meny_key == 'D')
+      else if(meny_key == 'R')
         {
-          edited_item = edit_item_desc(item);
-		  y_n_key = ask_question_yes_no("\nDo you wish to continue edit item?");
-		  if (y_n_key == 'Y') {edit_item_desc(edited_item);}
-		  if(y_n_key == 'N') return;
-        }
-		
-      else if(meny_key == 'P')
-        {
-          edited_item = edit_item_price(item);
-		  y_n_key = ask_question_yes_no("\nDo you wish to continue edit item?");
-		  if (y_n_key == 'Y') {edit_item_price(edited_item);}
-		  if(y_n_key == 'N') return;
-        }
-		
-      else if(meny_key == 'S')
-        {
-          edited_item = edit_item_shelf(item);
-		  y_n_key = ask_question_yes_no("\nDo you wish to continue edit item?");
-		  if (y_n_key == 'Y') {edit_item_shelf(edited_item);}
-		  if(y_n_key == 'N') return;
-        }
-		
-      else if(meny_key == 'A')
-        {
-          edited_item = edit_item_amount(item);
-		  y_n_key = ask_question_yes_no("\nDo you wish to continue edit item?");
-		  if (y_n_key == 'Y') {edit_item_name(edited_item);}
-		  if(y_n_key == 'N') return;
+          printf("!!!! NOT YET IMPLEMENTED !!!!\n");
         }
     }
-  while(meny_key != 'B');  // back	
+	
+  while(meny_key != 'Q');  // quit program, exit
 }
+
 
 
 int main()
@@ -595,17 +751,10 @@ int main()
   tree_insert(db, "jabba the hutt", item22);
   tree_insert(db, "hello kitty", item23);
  
+  
+  
+  
+  event_loop(db);
  
-  
-  // void *itemshow = item_spec(db, "hallon");
-  //print_item(itemshow);
-
-  
-   add_goods(db);
-
-  // list_items(db);
-  // char *ans =  answer_to_shelf_question(db);
-  //printf("%s\n", ans);
-   //  edit_menu_loop(item20);
-  
+  return 0;
 }

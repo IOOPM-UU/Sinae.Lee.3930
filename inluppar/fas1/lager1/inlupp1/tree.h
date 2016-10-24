@@ -12,8 +12,7 @@
 
 /// Define struct tree in your .c file not here! (why?)
 typedef struct tree tree_t;
-
-
+typedef struct node node_t;
 
 /// Creates a new tree
 ///
@@ -33,10 +32,8 @@ int tree_depth(tree_t *tree);
 //TODO tree_insert(tree_t *tree, TODO);
 bool tree_insert(tree_t *tree, char *key, void *data);
 
-
 void return_void_tree_insert(tree_t *tree, char *key, void *data);
 
-tree_t *tree_insert2(tree_t *tree, char *key, void *data);
 
 /// This does not need implementation until Assignment 2
 //TODO tree_remove(tree_t *tree, TODO);
@@ -53,7 +50,16 @@ list_t *tree_keys(tree_t *tree);
 
 list_t *list_node_data(tree_t *tree);
 
+list_t *list_of_data(tree_t *tree);
+
 list_t *list_node_shelf(tree_t *tree);
 
+void node_storage_list(node_t *node, list_t *list);
+
+list_t *list_tree_storage(tree_t *tree);
+
+void *search_data_in_tree(tree_t *tree, char *key);
+
+bool tree_remove_leaf(tree_t *tree, char *key);
 
 #endif
