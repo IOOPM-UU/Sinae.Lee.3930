@@ -23,11 +23,7 @@ public class Customer
     //metod registrera en av varor -minska på groceries
     public int serve()
     {
-        for (int i=0; i < groceries; ++i)
-            {
-                --groceries;
-            }
-
+        --groceries;
         return groceries;
         
     }
@@ -45,5 +41,4 @@ public class Customer
                 return false;
             }
     }
-    
 }
