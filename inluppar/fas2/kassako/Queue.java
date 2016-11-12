@@ -1,6 +1,6 @@
 
 
-public class Queue
+public class Queue<T>
 {
     private Node first;
     private Node last;
@@ -8,10 +8,10 @@ public class Queue
 
     private class Node
     {
-        private Customer element;
+        private T element;
         private Node next;
 
-        public Node (Customer element, Node next)
+        public Node (T element, Node next)
         {
             this.element = element;
             this.next = next;
@@ -43,21 +43,16 @@ public class Queue
 
     //public Customer getElement() {return element;}
     
-    public void enqueue(Customer element)
+    public void enqueue(T element)
     {
-        Node temp = new Node(element, null);
+        Node newNode = new Node(element, null);
 
-        if (last != null)
-            {
-                last.next = temp;
-                last = temp;
-            }
+        if (isEmpty() == true) {first = newNode;}
+        
+        else {last.next = newNode;}
 
-        else
-            {
-                first = last = temp;
-            }
-
+        last = newNode;
+        
         length++;
 
         System.out.println("adding: " + element);
@@ -65,29 +60,42 @@ public class Queue
 
     
     // ta bort (och returnera) kunden som står först i kön
-    //public Customer dequeue()
-    // {
-    //  if (isEmpty()) throw new NoSuchElementException ("The queue is empty");
-    //   Customer element = first.element;
-    //  first = first.next;
-    //  length--;
+    public T dequeue()
+    {
+        if (isEmpty() == true)
+            {
+                throw new EmptyQueueException();
+            }
         
-        
-    //}
+        T element = first.element;
 
-    //public Customer first()
-    // {
-    //  if (first != null)
-    //      {
-    //          return first.getElement();
-    //      }
+        if (last == first)
+            {
+                last = null;
+            }
 
-    //  else
-    //      {
-    //          System.out.println("There is no first.");
-    //      }
-    // }
-        
+        first = first.next;
+        length--;
+
+        System.out.println("dequeue: " + element);
+
+        return element;
+    }
+
+    public T first()
+    {
+        if (isEmpty() == true)
+            {
+                throw new EmptyQueueException();
+            }
+
+        T element = first.element;
+
+        System.out.println("first:" + element);
+        return element;
+    }
+
+    @SuppressWarnings("unchecked") 
     public static void main(String [] args)
     {
         Customer c1 = new Customer (2, 5);
@@ -99,15 +107,28 @@ public class Queue
 
         q.enqueue(c1);
         q.enqueue(c2);
+
+        q.first();
+        
         q.enqueue(c3);
         q.enqueue(c4);
 
-       
+        q.first();
+        
+        q.dequeue();
+
+        q.first();
+        
+        q.dequeue();
+        q.dequeue();
+
+        q.first();
+
+        q.dequeue();
         
         int size = q.length();
         System.out.println("length: " + size);
     }
-    
+}
     
    
-}
