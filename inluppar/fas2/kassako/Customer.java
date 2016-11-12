@@ -1,3 +1,5 @@
+//package kassako.customer;
+
 public class Customer
 {
     private int bornTime;    // tidssteget som kunden kom in i systemet
@@ -20,13 +22,6 @@ public class Customer
     {
         return bornTime;
     }
-    //metod registrera en av varor -minska på groceries
-    public int serve()
-    {
-        --groceries;
-        return groceries;
-        
-    }
 
     //metod fråga om kunden är färdig
     public boolean isDone()
@@ -41,4 +36,42 @@ public class Customer
                 return false;
             }
     }
+
+    // minska på groceries
+    public void serve()
+    {
+        if(groceries == 0)
+            {
+                throw new CustomerException();
+            }
+        
+        --groceries;
+        
+    }
+
+    /*
+    public static void main (String args[])
+    {
+        Customer c = new Customer(0, 3);
+
+        c.serve();
+        c.serve();
+        c.serve();
+
+         
+        
+
+        if(c.isDone())
+            {
+                System.out.println("The customer is done, just as expected!");
+            }
+        
+        else
+            {
+                System.out.println("The customer is not done, but should be...");
+        
+            }
+
+    }
+    */
 }
