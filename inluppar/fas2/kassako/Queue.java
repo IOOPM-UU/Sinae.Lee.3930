@@ -18,7 +18,7 @@ public class Queue<T>
         }
     }
 
-    public int length() {return length;}
+    public int length() {return this.length;}
 
     // empty queue. constructor
     public Queue()
@@ -26,6 +26,8 @@ public class Queue<T>
         first = last = null;
         length = 0;
     }
+
+   
     
     // is this queue empty?
     public boolean isEmpty()
@@ -60,7 +62,7 @@ public class Queue<T>
 
     
     // ta bort (och returnera) kunden som står först i kön
-    public T dequeue()
+    public T dequeue() throws EmptyQueueException
     {
         if (isEmpty() == true)
             {
@@ -82,29 +84,39 @@ public class Queue<T>
         return element;
     }
 
-    public T first()
+    public T first() throws EmptyQueueException
     {
         if (isEmpty() == true)
             {
-                throw new EmptyQueueException();
+                throw new EmptyQueueException("Queue is empty");
             }
 
         T element = first.element;
 
-        System.out.println("first:" + element);
+        // System.out.println("first:" + element);
         return element;
     }
 
-    @SuppressWarnings("unchecked") 
-    public static void main(String [] args)
+    /*
+    //@SuppressWarnings("unchecked") 
+    public static void main(String[] args)
     {
         Customer c1 = new Customer (2, 5);
         Customer c2 = new Customer (5, 7);
         Customer c3 = new Customer (1, 9);
         Customer c4 = new Customer (0, 10);
 
-        Queue q = new Queue();
+        int tid1 = 7;
+        int tid2 = 10;
+        
+        Queue<Customer> q = new Queue<Customer>();
+        Queue<Integer> q1 = new Queue<Integer>();
 
+        q1.enqueue(tid1);
+        q1.enqueue(tid2);
+        int len = q1.length();
+        System.out.println("length:" +len);
+        
         q.enqueue(c1);
         q.enqueue(c2);
 
@@ -129,6 +141,7 @@ public class Queue<T>
         int size = q.length();
         System.out.println("length: " + size);
     }
+    */
 }
     
    

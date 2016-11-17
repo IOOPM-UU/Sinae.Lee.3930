@@ -49,8 +49,15 @@ public class Customer
         
     }
 
-    /*
-    public static void main (String args[])
+    public String toString()
+    {
+        return "[" + groceries + "]";
+    }
+
+
+    
+    
+    public static void main (String[] args)
     {
         Customer c = new Customer(0, 3);
 
@@ -73,5 +80,5 @@ public class Customer
             }
 
     }
-    */
+   
 }
