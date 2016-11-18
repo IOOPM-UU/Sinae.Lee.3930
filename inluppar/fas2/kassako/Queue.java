@@ -11,6 +11,7 @@ public class Queue<T>
         private T element;
         private Node next;
 
+        
         public Node (T element, Node next)
         {
             this.element = element;
@@ -55,9 +56,9 @@ public class Queue<T>
 
         last = newNode;
         
-        length++;
+        ++length;
 
-        System.out.println("adding: " + element);
+        // System.out.println("adding: " + element);
     }
 
     
@@ -77,27 +78,28 @@ public class Queue<T>
             }
 
         first = first.next;
-        length--;
+        --length;
 
-        System.out.println("dequeue: " + element);
+        // System.out.println("dequeue: " + element);
 
         return element;
     }
 
-    public T first() throws EmptyQueueException
+    public T first() throws EmptyQueueException 
     {
-        if (isEmpty() == true)
+
+        if (!isEmpty())
             {
-                throw new EmptyQueueException("Queue is empty");
+                T element = first.element;
+                return element;
             }
+       else
+            {throw new EmptyQueueException();}
 
-        T element = first.element;
-
-        // System.out.println("first:" + element);
-        return element;
+        
     }
 
-    /*
+    
     //@SuppressWarnings("unchecked") 
     public static void main(String[] args)
     {
@@ -106,42 +108,39 @@ public class Queue<T>
         Customer c3 = new Customer (1, 9);
         Customer c4 = new Customer (0, 10);
 
-        int tid1 = 7;
-        int tid2 = 10;
+        
         
         Queue<Customer> q = new Queue<Customer>();
-        Queue<Integer> q1 = new Queue<Integer>();
-
-        q1.enqueue(tid1);
-        q1.enqueue(tid2);
-        int len = q1.length();
-        System.out.println("length:" +len);
+       
+    
         
         q.enqueue(c1);
         q.enqueue(c2);
 
-        q.first();
+        q.first();  // 5
+        
         
         q.enqueue(c3);
         q.enqueue(c4);
 
-        q.first();
+        q.first(); // 5
         
-        q.dequeue();
+        q.dequeue(); // c1 bort
 
-        q.first();
+        q.first();  // 7
         
-        q.dequeue();
-        q.dequeue();
+        q.dequeue(); // c2 bort
+        q.dequeue(); // c3 bort
 
-        q.first();
+        q.first();  // 10
+        System.out.println(q.first());
 
-        q.dequeue();
-        
+        q.dequeue(); // c4 bort
+        System.out.println(q.first());
         int size = q.length();
-        System.out.println("length: " + size);
+        System.out.println("length: " + size);  // 0
     }
-    */
+   
 }
     
    

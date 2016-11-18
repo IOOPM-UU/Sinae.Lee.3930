@@ -5,7 +5,6 @@ public class Customer
     private int bornTime;    // tidssteget som kunden kom in i systemet
     private int groceries;  //antalet varor i kundkorg
 
-    //constructor?
     public Customer (int bornTime, int groceries)
     {
         this.bornTime = bornTime;
@@ -23,7 +22,6 @@ public class Customer
         return bornTime;
     }
 
-    //metod fråga om kunden är färdig
     public boolean isDone()
     {
         if (groceries == 0)
@@ -40,15 +38,14 @@ public class Customer
     // minska på groceries
     public void serve()
     {
-        if(groceries == 0)
+        if(groceries > 0)
             {
-                throw new CustomerException();
+                --groceries;
             }
         
-        --groceries;
-        
     }
-
+    
+    @Override
     public String toString()
     {
         return "[" + groceries + "]";

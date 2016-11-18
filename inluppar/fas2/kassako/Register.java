@@ -29,7 +29,7 @@ public class Register
     
     public boolean hasCustomer()
     {
-        if (queue.length() != 0)
+        if (queue.length() > 1)
             {
                 return true;
             }
@@ -40,20 +40,35 @@ public class Register
             }
     }
 
-    public boolean currentCustomerIsDone()
+    public boolean currentCustomerIsDone() 
     {
+        try{
         return queue.first().isDone();
+        }
+        catch (EmptyQueueException e){return false;}
+        
     }
 
     public void step()
     {
-        try{
-        if (isOpen() && hasCustomer())
-            {
-                queue.first().serve();
-            }
+      
+        if (isOpen()){
+
+            //  if (currentCustomerIsDone())
+            //  {
+            //      removeCurrentCustomer();
+                    
+            //  }
+
+            if (hasCustomer())
+                {
+                    queue.first().serve();
+                }
+
+           
+            
         }
-        catch (CustomerException e){};
+        
     }
     
     public void addToQueue(Customer c)
@@ -63,7 +78,8 @@ public class Register
 
     public Customer removeCurrentCustomer() throws EmptyQueueException
     {
-        if (queue.length() != 0)
+        
+        if (getQueueLength() != 0)
             {
                 return queue.dequeue();
             }
@@ -80,7 +96,7 @@ public class Register
         return queue.length();
     }
 
-    
+    @Override
     public String toString()
     {
         String s = "";  // create a String
@@ -100,11 +116,38 @@ public class Register
                     {s = s + "@";}
 
             }
-
-        System.out.println(s);
         return s;
         
     }
+    /*
+    public String toString()
+    {
+        if(isOpen() && hasCustomer()){
+            String s = "";  // create a String
+            if(this.queue.length() > 0){
+                
+                s = this.queue.first().toString();
+                int i = this.queue.length()-1;
+                while(i > 0){
+                    s += "@";
+                    i--;
+                }
+            }
+            return s;
+        }else{
+            return "X [ ]";
+        }
+
+
+
+
+
+            
+       
+       
+        
+    }
+    */
    
     
     
@@ -118,71 +161,29 @@ public class Register
         Register r = new Register();
         Register r1 = new Register();
         Register r2 = new Register();
-        r.addToQueue(c1);
-        r.addToQueue(c2);
-        r.addToQueue(c3);
-        r.addToQueue(c4);
-
-        boolean yesOrNo =  r.hasCustomer();
-        if (yesOrNo == true)
-            {
-                System.out.println("det finns customer");
-            }
-        else {System.out.println("ingen customer");}
-            
-        
-        
-        int g = c1.getGroceries();
-        System.out.println("antal hos c1:" + g);
-
-        
-
-        int g1 = c2.getGroceries();
-        System.out.println("antal hos c2:" + g1);
-
-         
-        r.removeCurrentCustomer();
-        r.removeCurrentCustomer();
-        r.removeCurrentCustomer();
-
-        
-
-        int g3 = r.queue.first().getGroceries();
-
-        System.out.println("antal hos c1:" + g3);
-        
-        
-
-        int len = r.getQueueLength();
-        System.out.println("Length:" + len);
+      
 
 
         r.addToQueue(c1);
         r.addToQueue(c2);
         r.addToQueue(c3);
         r.addToQueue(c4);
-        r.step();
-        r.step();
-        r.step();
-        r.step();
-        r.step();
-        r.step();
-	
-        int groc = r.queue.first().getGroceries();
-        System.out.println("Groceries: " + groc);
-        
-        r.removeCurrentCustomer();        
-
-        int leng = r.getQueueLength();
-        System.out.println("Length:" + leng);
-
-        r.toString();
-        r1.toString();
-        r2.toString();
-        
-        
-        
        
+
+      
+       
+
+        int l = r.getQueueLength();
+        System.out.println(l);
+
+        r.step();
+        r.step();
+        r.step();
+        r.step();
+
+        System.out.println(r.getQueueLength());
+
+        
     }
     
     

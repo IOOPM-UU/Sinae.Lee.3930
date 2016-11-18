@@ -34,59 +34,45 @@ public class Store{
     public int getAmountOfClosedRegisters(){
         return (getAmountOfRegisters() - getAmountOfOpenRegisters());
     }
+
     
     public int getAverageQueueLength(){
         int totalCustomers = 0;
-        // int openRegisters = 0; //just to check
         int amountOfOpenRegisters = getAmountOfOpenRegisters();
 	
         for (Register r : this.registers){
             if (r.isOpen()){
-                totalCustomers += r.queue.length();
-                //++openRegisters;
+                totalCustomers += r.getQueueLength();
             }
         }
-		
-        // System.out.println("amount of open registers: " + amountOfOpenRegisters + " and you got: " + openRegisters);
 		
         return totalCustomers/amountOfOpenRegisters;
     }
     
+    
     public void newCustomer(Customer c){
         int i = 0;
-        int shortest = this.registers[i].queue.length();
+        int shortest = this.registers[i].getQueueLength();
         int totalRegisters = getAmountOfRegisters();
 	
         for(int j = 1; j < totalRegisters; ++j){
             if(this.registers[j].isOpen()){
-                if(this.registers[j].queue.length() < shortest){
-                    shortest = this.registers[j].queue.length();
+                if(this.registers[j].getQueueLength() < shortest){
+                    shortest = this.registers[j].getQueueLength();
                     i = j;
                     
                 }
             }
         }
-        //System.out.println("Register " + i + " has the shortest queue. Lenght: "+ shortest);
+       
         this.registers[i].addToQueue(c);
     }
     
     public void step(){
-        try
-            {
-                for(Register r: this.registers){
-                    if(r.isOpen()){
-                        r.step();
-                        int groc = r.queue.first().getGroceries();
-                    }
-
-                 
-                }
-
-                getDoneCustomers();
-                toString();
-            }
-        
-        catch (EmptyQueueException e) {};
+       
+        for(Register r: this.registers){
+                   
+            r.step(); }
     }
 	
     public void openNewRegister(){
@@ -100,13 +86,24 @@ public class Store{
         }
     }
 	
-    public Queue<Customer> getDoneCustomers(){
+    public Queue<Customer> getDoneCustomers()
+    {
+        
         Queue<Customer> doneCustomers = new Queue<Customer>();
-        for(Register r : this.registers){
-            if(r.isOpen() && r.currentCustomerIsDone()){
-                doneCustomers.enqueue(r.removeCurrentCustomer());
-            }
-        }
+        
+           
+                for(Register r : this.registers)
+                    {
+                        if(r.isOpen() && r.currentCustomerIsDone())
+                            {
+                                doneCustomers.enqueue(r.removeCurrentCustomer());
+                            }
+                    }
+        
+            
+       
+   
+                //System.out.println(doneCustomers.length());
         return doneCustomers;
     } 
 
@@ -116,16 +113,17 @@ public class Store{
         for(Register r : this.registers){
             totCustomers += r.queue.length();
         }
-        System.out.println("Total customers is: " + totCustomers);
+        // System.out.println("Total customers is: " + totCustomers);
         return totCustomers;
     }
-
+    
+    @Override
     public String toString()
     {
-        String s = "\n";
+        String s = "";
         for (Register r : this.registers)
             {
-                s = s + r.toString();
+                s = s + r.toString() + "\n";
             }
 
         // System.out.println(s);
@@ -182,7 +180,7 @@ public class Store{
         butik.step();
         butik.step();
         butik.step();
-        butik.step();
+        // butik.step();
         // butik.step();
         //butik.step();
 	
