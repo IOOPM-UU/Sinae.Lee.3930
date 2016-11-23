@@ -1,4 +1,10 @@
-
+/**
+ * Queues order elements in a FIFO manner.
+ * @author Sinae Lee
+ * @author Marie Paulsson
+ * @version 1.0
+ * @since 2016-11-20
+ */
 
 public class Queue<T>
 {
@@ -19,18 +25,25 @@ public class Queue<T>
         }
     }
 
-    public int length() {return this.length;}
-
-    // empty queue. constructor
     public Queue()
     {
         first = last = null;
         length = 0;
     }
 
+/**
+ * This method is used to get the length of queue.
+ * 
+ * @return int - a length of queue
+ */
+    public int length() {return this.length;}
+
    
-    
-    // is this queue empty?
+/**
+ * This method is used to get the boolean value if the queue is empty.
+ * 
+ * @return boolean true - if the queue is empty.
+ */
     public boolean isEmpty()
     {
         if (first == null)
@@ -44,7 +57,10 @@ public class Queue<T>
             }
     }
 
-    //public Customer getElement() {return element;}
+/**
+ * This method is used to insert an element into the queue.
+ * @param element the element to add
+ */
     
     public void enqueue(T element)
     {
@@ -57,12 +73,15 @@ public class Queue<T>
         last = newNode;
         
         ++length;
-
-        // System.out.println("adding: " + element);
     }
 
     
-    // ta bort (och returnera) kunden som står först i kön
+    /**
+     * This method is used to remove and retrieve the head of the queue.
+     * 
+     * @return the head of the queue
+     * @exception EmptyQueueException if the queue is empty
+     */
     public T dequeue() throws EmptyQueueException
     {
         if (isEmpty() == true)
@@ -80,10 +99,16 @@ public class Queue<T>
         first = first.next;
         --length;
 
-        // System.out.println("dequeue: " + element);
-
         return element;
     }
+
+    /**
+     * This method is used to retrieve the head of the queue 
+     * or throw an exception if the queue is empty.
+     * 
+     * @return the head of the queue
+     * @exception EmptyQueueException if the queue is empty
+     */
 
     public T first() throws EmptyQueueException 
     {
@@ -99,48 +124,4 @@ public class Queue<T>
         
     }
 
-    
-    //@SuppressWarnings("unchecked") 
-    public static void main(String[] args)
-    {
-        Customer c1 = new Customer (2, 5);
-        Customer c2 = new Customer (5, 7);
-        Customer c3 = new Customer (1, 9);
-        Customer c4 = new Customer (0, 10);
-
-        
-        
-        Queue<Customer> q = new Queue<Customer>();
-       
-    
-        
-        q.enqueue(c1);
-        q.enqueue(c2);
-
-        q.first();  // 5
-        
-        
-        q.enqueue(c3);
-        q.enqueue(c4);
-
-        q.first(); // 5
-        
-        q.dequeue(); // c1 bort
-
-        q.first();  // 7
-        
-        q.dequeue(); // c2 bort
-        q.dequeue(); // c3 bort
-
-        q.first();  // 10
-        System.out.println(q.first());
-
-        q.dequeue(); // c4 bort
-        System.out.println(q.first());
-        int size = q.length();
-        System.out.println("length: " + size);  // 0
-    }
-   
 }
-    
-   

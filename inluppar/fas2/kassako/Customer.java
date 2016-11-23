@@ -1,81 +1,86 @@
-//package kassako.customer;
+/** 
+ * The Customer program implements an appication that 
+ * create a customer with number of goods and
+ * time-step that the customer came in the system
+ * and reduce the number of goods. 
+ *
+ * @author Sinae Lee
+ * @author Marie Paulsson
+ * @version 1.0
+ * @since  2016-11-20
+ */
 
-public class Customer
-{
-    private int bornTime;    // tidssteget som kunden kom in i systemet
-    private int groceries;  //antalet varor i kundkorg
-
-    public Customer (int bornTime, int groceries)
-    {
+public class Customer{
+    
+    private int bornTime;    
+    private int groceries;
+    
+    public Customer (int bornTime, int groceries){
+        
         this.bornTime = bornTime;
         this.groceries = groceries;
     }
 
-    // get number of groceries
-    public int getGroceries()
-    {
+/**
+ * This method is used to get number of goods.
+ * 
+ * @return int This returns current number of goods.
+ */
+
+    public int getGroceries(){
+       
         return groceries;
     }
 
-    public int getBornTime()
-    {
+/**
+ * This method is used to get the time-step that a customer came in the system.
+ *
+ * @return int the time-step.
+ */
+    public int getBornTime(){
+       
         return bornTime;
     }
 
-    public boolean isDone()
-    {
-        if (groceries == 0)
-            {
+/**
+ * This method is used to get the boolean value that 
+ * indicates if customer has 0 goods.
+ *
+ * @return boolean true or false.
+ */    
+    public boolean isDone(){
+        
+        if (groceries == 0){
                 return true;
             }
 
-        else
-            {
+        else{
                 return false;
             }
     }
-
-    // minska på groceries
-    public void serve()
-    {
-        if(groceries > 0)
-            {
+    
+ /**
+  * This method is used to reduce number of goods with interval -1.
+  *
+  * @exception CustomerException if groceries is 0.
+  */
+    public void serve(){
+       
+        if(groceries > 0){
                 --groceries;
             }
         
     }
-    
-    @Override
-    public String toString()
-    {
+
+/**
+ * This method is used to represent number of goods.
+ *
+ * @return a string that "textually represents" number of goods.
+ */    
+   @Override
+   public String toString(){
+       
         return "[" + groceries + "]";
-    }
-
-
-    
-    
-    public static void main (String[] args)
-    {
-        Customer c = new Customer(0, 3);
-
-        c.serve();
-        c.serve();
-        c.serve();
-
-         
-        
-
-        if(c.isDone())
-            {
-                System.out.println("The customer is done, just as expected!");
-            }
-        
-        else
-            {
-                System.out.println("The customer is not done, but should be...");
-        
-            }
-
     }
    
 }

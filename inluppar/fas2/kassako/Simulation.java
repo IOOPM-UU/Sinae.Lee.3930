@@ -8,10 +8,10 @@ public class Simulation {
     private int thresholdForNewRegister;
     private Random random;
     
-    public int servedCustomers = 0;
-    public int maxWaitTime = 0;
-    public float averageWaitTime = 0;
-    public int totalTime = 0;
+    private int servedCustomers = 0;
+    private int maxWaitTime = 0;
+    private float averageWaitTime = 0;
+    private int totalTime = 0;
     
 	
     public Simulation(int amountOfRegisters, int intensity,
@@ -44,107 +44,50 @@ public class Simulation {
         this.maxWaitTime = 0;
         this.averageWaitTime = 0;
     }
-    
+
+    /**
+     * This method is used to return the sum of served customers.
+     *
+     * @return int the sum of served customers.
+     */
     public int getServedCustomers(){
         return this.servedCustomers;
-    }    
+    }
+
+
+    /**
+     * This method is used to return the maxium waiting time.
+     *
+     * @return int the maximum waiting time
+     */
     public int getMaxWaitTime(){
         return this.maxWaitTime;
     }
-    
+
+    /**
+     * This method is used to return the average waiting time.
+     *
+     * @return float the average waiting time
+     */
     public float getAverageWaitTime(){
         return this.averageWaitTime;
     }
     
-    
+    /**
+     * This method is used to calculate the sum of served customers
+     *
+     * @param doneCustomers a collection of served customers
+     */
     public void calculateServedCustomers(Queue<Customer>doneCustomers)
     {
         this.servedCustomers += doneCustomers.length();
-        //System.out.println("Served customers is " + this.servedCustomers);
     }
     
-
-    
-    // private void calculateMaxWaitTime(Queue<Customer> doneCustomers){
-    //  Customer temp = doneCustomers.first();
-    //  int servedCustomers = getServedCustomers();
-    //  int served = 0; //just to check
-	
-    //  for(int i = 0; i < servedCustomers; ++i){
-    //      int waitedTime = this.time - temp.getBornTime();
-    //      System.out.print(waitedTime);
-    //      if(this.maxWaitTime < waitedTime){
-    //          System.out.println(" is bigger than " + maxWaitTime);
-    //          this.maxWaitTime = waitedTime;
-    //      }
-    //      ++served;
-    //      temp = temp.next;
-    //  }
-	
-        /*for (Customer c : doneCustomers){
-          int waitedTime = this.time - c.getBornTime();
-          System.out.print(waitedTime);
-          if(this.maxWaitTime < waitedTime){
-          System.out.println(" is bigger than " + maxWaitTime);
-          this.maxWaitTime = waitedTime;
-          }
-          ++served;
-          }*/
-    //  System.out.println("Total served customers is: " + servedCustomers + "but got: " + served);
-    // }
-
-    /*
-private void calculateMaxWaitTime(Queue<Customer> doneCustomers){
-    try{
-    int servedCustomers = getServedCustomers();
-    Customer temp = doneCustomers.dequeue();
-    System.out.println("Customers served: " + servedCustomers);
-    
-    for(int i = 0; i < servedCustomers; ++i){
-        int waitedTime = this.time - temp.getBornTime();
-        System.out.print(waitedTime);
-        if(this.maxWaitTime < waitedTime){
-            System.out.println(" is bigger than " + maxWaitTime);
-            this.maxWaitTime = waitedTime;
-        }
-        if(doneCustomers.length() == 0){
-            break;
-        }
-        temp = doneCustomers.dequeue();
-    }
-    }
-    catch (EmptyQueueException e){};
-    System.out.println("Total served customers is: " + servedCustomers);
-}
-    
-    
-    /*	
-    private void calculateAverageWaitTime(Queue<Customer> doneCustomers){
-        try{
-        int totalWaitTime = 0;
-        int servedCustomers = getServedCustomers();
-	
-        Customer temp = doneCustomers.dequeue();
-	
-        for(int i = 0; i < servedCustomers; ++i){
-            int waitedTime = this.time - temp.getBornTime();
-            totalWaitTime += waitedTime;
-            if(doneCustomers.length() == 0){
-                break;
-            }
-            temp = doneCustomers.dequeue();
-        }
-       
-        
-	
-        this.averageWaitTime = totalWaitTime / servedCustomers;
-        System.out.println("Total wait time: " + totalWaitTime + ", Served customers: " + servedCustomers + ", Average time: " + this.averageWaitTime);
-        }
-        catch (EmptyQueueException e){};
-    
-*/
-	
-    
+    /**
+     * This method is used to calculate the statistics that indicates average waiting time.
+     * 
+     * @param doneCustomers a collection of served customers
+     */
     public void measureStatistics(Queue<Customer> doneCustomers){
         
        
@@ -167,80 +110,65 @@ private void calculateMaxWaitTime(Queue<Customer> doneCustomers){
            
         }
             
-        //calculateServedCustomers(doneCustomers);
         
-        // calculateMaxWaitTime(doneCustomers);
-        //calculateAverageWaitTime(doneCustomers);
-	
-        /*for (Customer c : doneCustomers){
-          int waited = this.time - c.getBornTime();
-          if (this.maxWaitTime < waited){
-          this.maxWaitTime = waited;
-          }
-          
-          this.averageWaitTime = (averageWaitTime * served + waited) / (served + 1);
-          ++served;
-          }*/
     }
 
-    //  @SuppressWarnings("unchecked")
-    public void step() {
-        try{
-        ++time;
-        store.step();
+    /**
+     * This method is used to reduce 
+     */
 
-        Queue<Customer> done = store.getDoneCustomers();
-        measureStatistics(done);
-        // System.out.println("Served customers: " + done.length());
-        
-        if(random.nextInt(100) < intensity) {
-            store.newCustomer(new Customer(time, 1 + random.nextInt(maxGroceries)));
-        }
+    public void step()
+    {
+        try
+            {
+                ++time;
+                store.step();
+
+                Queue<Customer> done = store.getDoneCustomers();
+                measureStatistics(done);
+                
+                if(random.nextInt(100) < intensity)
+                    {
+                        store.newCustomer(new Customer(time, 1 + random.nextInt(maxGroceries)));
+                    }
 	
-        int averageQueueLenght = store.getAverageQueueLength();
-        int registersClosed = store.getAmountOfClosedRegisters();
-        if (registersClosed != 0 && averageQueueLenght > thresholdForNewRegister){
-            store.openNewRegister();
-        }
+                int averageQueueLenght = store.getAverageQueueLength();
+                int registersClosed = store.getAmountOfClosedRegisters();
+                if (registersClosed != 0 && averageQueueLenght > thresholdForNewRegister)
+                    {
+                        store.openNewRegister();
+                    }
         
-       
-       
-      
-        
-        }
+            }
+
         catch (EmptyQueueException e){};
         
     }
     
-
+    /**
+     * This method is used to represent the condition of store and the statistics.
+     *
+     * @return a string that textually represents the condition and the statistics.
+     */
     @Override
-    public String toString() {
-
-        //int numberOfCustomersServed = getServedCustomers();
-        //System.out.println("Number of customers served: " + numberOfCustomersServed);
-
-        //int maxWaitTime = getMaxWaitTime();
-        //System.out.println("Max wait-time: " + maxWaitTime);
-
-        //float averageWaitTime = getAverageWaitTime();
-        // System.out.println("Average wait-time: " + averageWaitTime);
-
+    public String toString()
+    {
        
         System.out.println("\nNumber of served customers: " + this.servedCustomers + "\n");
         System.out.println("\nAverage time: " + this.averageWaitTime + "\n");
         System.out.println("\nMax wait time: " + this.maxWaitTime + "\n");
-
+        
         return this.store.toString();
+       
        
     }
 
-  
+    /*
     public static void main(String[] args)
     {
         Simulation simulation = new Simulation(4, 60, 5, 4);
        
-	
-        Customer c1 = new Customer(0, 5);
+	Customer c1 = new Customer(0, 5);
         Customer c2 = new Customer (5, 7);
         simulation.store.newCustomer(c1);
         simulation.store.newCustomer(c2);
@@ -252,11 +180,9 @@ private void calculateMaxWaitTime(Queue<Customer> doneCustomers){
                 try
                     {
                         Thread.sleep(1000);
-                        
                     }
                 catch(InterruptedException e){}
             }
-       
-	
     }
+    */
 }

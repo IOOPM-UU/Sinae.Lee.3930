@@ -3,33 +3,47 @@ public class Register
 {
     private boolean open;
     public Queue<Customer> queue;
-
-    //constructor
+    
     public Register()
     {
-        open = false;  //close
+        open = false;  
         queue = new Queue<Customer>();
     }
 
-    // method
+    /**
+     * This method is used to open a register.
+     */
     public void open()
     {
         this.open = true;
     }
-    
+
+    /**
+     * This method is used to close a register.
+     */
     public void close()
     {
         this.open = false;
     }
-    
+
+    /**
+     * This method is used to get a boolean value if a register is open.
+     * 
+     * @return true - if the register is open
+     */
     public boolean isOpen()
     {
         return this.open;
     }
-    
+
+    /**
+     * This method is used to get a boolean value if the register has a customer
+     *
+     * @return true - if there is/are customer(s)
+     */
     public boolean hasCustomer()
     {
-        if (queue.length() > 1)
+        if (queue.length() > 0)
             {
                 return true;
             }
@@ -40,6 +54,13 @@ public class Register
             }
     }
 
+    /**
+     * This method is used to get a boolean value if the head of the queue have no goods.
+     * 
+     * @return true 
+     * @exception EmptyQueueException if the queue is empty
+     */
+
     public boolean currentCustomerIsDone() 
     {
         try{
@@ -49,33 +70,44 @@ public class Register
         
     }
 
+    /**
+     * This method is used to reduce the queue if the register is open.
+     */
     public void step()
     {
       
-        if (isOpen()){
+        if (isOpen())
+            {
 
-            //  if (currentCustomerIsDone())
-            //  {
-            //      removeCurrentCustomer();
-                    
-            //  }
 
-            if (hasCustomer())
-                {
-                    queue.first().serve();
-                }
+                if (hasCustomer())
+                    {
+                        queue.first().serve();
+                    }
 
            
             
-        }
+            }
         
     }
+
+    /**
+     * This method is used to add a customer into the queue.
+     * 
+     * @param c a Customer
+     */
     
     public void addToQueue(Customer c)
     {
        queue.enqueue(c);
     }
 
+    /**
+     * This method is used to remove the head of the queue and return it.
+     * 
+     * @return Customer
+     * @exception EmptyQueueException if the queue is empty and register is closed.
+     */
     public Customer removeCurrentCustomer() throws EmptyQueueException
     {
         
@@ -91,11 +123,21 @@ public class Register
             }
     }
 
+    /**
+     * This method is used to get the length of the queue.
+     *
+     * @return int - the length of the queue.
+     */
     public int getQueueLength()
     {
         return queue.length();
     }
 
+    /**
+     * This method is used to represent the condition of registers.
+     *
+     * @return a string that textually represents the condition of registers.
+     */
     @Override
     public String toString()
     {
@@ -118,75 +160,5 @@ public class Register
             }
         return s;
         
-    }
-    /*
-    public String toString()
-    {
-        if(isOpen() && hasCustomer()){
-            String s = "";  // create a String
-            if(this.queue.length() > 0){
-                
-                s = this.queue.first().toString();
-                int i = this.queue.length()-1;
-                while(i > 0){
-                    s += "@";
-                    i--;
-                }
-            }
-            return s;
-        }else{
-            return "X [ ]";
-        }
-
-
-
-
-
-            
-       
-       
-        
-    }
-    */
-   
-    
-    
-    public static void main(String[] args)
-    {
-        Customer c1 = new Customer(2, 5);
-        Customer c2 = new Customer (5, 7);
-        Customer c3 = new Customer (1, 9);
-        Customer c4 = new Customer (0, 10);
-
-        Register r = new Register();
-        Register r1 = new Register();
-        Register r2 = new Register();
-      
-
-
-        r.addToQueue(c1);
-        r.addToQueue(c2);
-        r.addToQueue(c3);
-        r.addToQueue(c4);
-       
-
-      
-       
-
-        int l = r.getQueueLength();
-        System.out.println(l);
-
-        r.step();
-        r.step();
-        r.step();
-        r.step();
-
-        System.out.println(r.getQueueLength());
-
-        
-    }
-    
-    
-    
-    
+    }    
 }

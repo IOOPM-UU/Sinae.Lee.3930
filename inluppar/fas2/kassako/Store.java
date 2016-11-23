@@ -1,90 +1,147 @@
-public class Store{
+public class Store
+{
     private Register registers[];
     
-    public Store(int amountOfRegisters){
-        if (amountOfRegisters > 0){
-            this.registers = new Register[amountOfRegisters];
-            for(int i = 0; i < amountOfRegisters; ++i){
-                this.registers[i] = new Register();
+    public Store(int amountOfRegisters)
+    {
+        if (amountOfRegisters > 0)
+            {
+                this.registers = new Register[amountOfRegisters];
+                for(int i = 0; i < amountOfRegisters; ++i)
+                    {
+                        this.registers[i] = new Register();
+                    }
+                this.registers[0].open();
             }
-            this.registers[0].open();
-        }
     }
     
-    //methods
-    
-    public int getAmountOfOpenRegisters(){
+    /**
+     * This method is used to calculate the sum of opened registers.
+     * 
+     * @return int - the sum of opened registers
+     */
+    public int getAmountOfOpenRegisters()
+    {
         int totalOpenRegisters = 0;
-        for (Register r : this.registers){
-            if(r.isOpen()){
-                ++totalOpenRegisters;
+        for (Register r : this.registers)
+            {
+                if(r.isOpen())
+                    {
+                        ++totalOpenRegisters;
+                    }
             }
-        }
         return totalOpenRegisters;
     }
-    
-    public int getAmountOfRegisters(){
+
+    /**
+     * This method is used to calculate the sum of registers.
+     * 
+     * @return int - the sum of registers
+     */
+    public int getAmountOfRegisters()
+    {
         int totalRegisters = 0;
-        for (Register r : this.registers){
-            ++totalRegisters;
-        }
+        for (Register r : this.registers)
+            {
+                ++totalRegisters;
+            }
         return totalRegisters;
     }
-    
-    public int getAmountOfClosedRegisters(){
+
+    /**
+     * This method is used to calculate the sum of closed registers.
+     *
+     * @return int - the sum of closed registers
+     */
+    public int getAmountOfClosedRegisters()
+    {
         return (getAmountOfRegisters() - getAmountOfOpenRegisters());
     }
 
-    
-    public int getAverageQueueLength(){
+    /**
+     * This method is used to calculate the average queue length
+     * 
+     * @return int - the average queue length
+     */
+    public int getAverageQueueLength()
+    {
         int totalCustomers = 0;
         int amountOfOpenRegisters = getAmountOfOpenRegisters();
 	
-        for (Register r : this.registers){
-            if (r.isOpen()){
-                totalCustomers += r.getQueueLength();
+        for (Register r : this.registers)
+            {
+                if (r.isOpen())
+                    {
+                        totalCustomers += r.getQueueLength();
+                    }
             }
-        }
 		
         return totalCustomers/amountOfOpenRegisters;
     }
+
+    /**
+     * This method is used to put a Customer into the shortes queue.
+     *
+     * @param c a Customer
+     */
     
-    
-    public void newCustomer(Customer c){
+    public void newCustomer(Customer c)
+    {
         int i = 0;
         int shortest = this.registers[i].getQueueLength();
         int totalRegisters = getAmountOfRegisters();
 	
-        for(int j = 1; j < totalRegisters; ++j){
-            if(this.registers[j].isOpen()){
-                if(this.registers[j].getQueueLength() < shortest){
-                    shortest = this.registers[j].getQueueLength();
-                    i = j;
+        for(int j = 1; j < totalRegisters; ++j)
+            {
+                if(this.registers[j].isOpen())
+                    {
+                        if(this.registers[j].getQueueLength() < shortest)
+                            {
+                                shortest = this.registers[j].getQueueLength();
+                                i = j;
                     
-                }
+                            }
+                    }
             }
-        }
-       
+        
         this.registers[i].addToQueue(c);
     }
+
+    /**
+     * This method is used to reduce the queue of the registers.
+     */
     
-    public void step(){
-       
-        for(Register r: this.registers){
-                   
-            r.step(); }
+    public void step()
+    {
+        
+        for(Register r: this.registers)
+            {
+                r.step();
+            }
     }
-	
-    public void openNewRegister(){
+
+    /**
+     * This method is used to open a new register.
+     */
+    public void openNewRegister()
+    {
         int amountOfRegisters = getAmountOfRegisters();
 		
-        for(int i = 0; i < amountOfRegisters; ++i){
-            if(!this.registers[i].isOpen()){
-                this.registers[i].open();
-                break;
+        for(int i = 0; i < amountOfRegisters; ++i)
+            {
+                if(!this.registers[i].isOpen())
+                    {
+                        this.registers[i].open();
+                        break;
+                    }
             }
-        }
     }
+
+    /**
+     * This method is used to put the customers that is done with paying into a queue.
+     *
+     * @return Queue a collection of finished Customers
+     */
 	
     public Queue<Customer> getDoneCustomers()
     {
@@ -99,23 +156,32 @@ public class Store{
                                 doneCustomers.enqueue(r.removeCurrentCustomer());
                             }
                     }
-        
-            
-       
-   
-                //System.out.println(doneCustomers.length());
+                
         return doneCustomers;
     } 
 
 
-    public int getTotalCustomers(){
+    /**
+     * This method is used to calculate the sum of customers that are in the queues.
+     *
+     * @return int - the sum of customers
+     */
+    public int getTotalCustomers()
+    {
         int totCustomers = 0;
-        for(Register r : this.registers){
-            totCustomers += r.queue.length();
-        }
-        // System.out.println("Total customers is: " + totCustomers);
+        for(Register r : this.registers)
+            {
+                totCustomers += r.queue.length();
+            }
+        
         return totCustomers;
     }
+
+    /**
+     * This method is used to represent the condition of store with breaking line.
+     *
+     * @return a string that textually represents the condition of store.
+     */
     
     @Override
     public String toString()
@@ -125,17 +191,17 @@ public class Store{
             {
                 s = s + r.toString() + "\n";
             }
-
-        // System.out.println(s);
+        
         return s;
     }
-    
+
+    /*
     public static void main(String[] args)
     {
-        Customer c1 = new Customer(2, 5); // kassa 0
+        Customer c1 = new Customer(2, 5); 
         Customer c2 = new Customer (5, 7);
-        Customer c3 = new Customer (1, 9); // kassa 1
-        Customer c4 = new Customer (0, 10); // kassa 2
+        Customer c3 = new Customer (1, 9); 
+        Customer c4 = new Customer (0, 10);
         Customer c5 = new Customer(2, 5);
         Customer c6 = new Customer (5, 7);
         Customer c7 = new Customer (1, 9);
@@ -195,8 +261,7 @@ public class Store{
 	
         System.out.println("Median: " + snitt + "\nTotal registers: " + totalRegisters);
         System.out.println("Open registers: " + openReg);
-
-        // butik.toString();
-    }
+        }
+    */
     
 }
