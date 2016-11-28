@@ -13,7 +13,7 @@
 public class Customer{
     
     private int bornTime;    
-    private int groceries;
+    public int groceries;
     
     public Customer (int bornTime, int groceries){
         
@@ -61,8 +61,6 @@ public class Customer{
     
  /**
   * This method is used to reduce number of goods with interval -1.
-  *
-  * @exception CustomerException if groceries is 0.
   */
     public void serve(){
        
@@ -83,4 +81,5 @@ public class Customer{
         return "[" + groceries + "]";
     }
    
-}
+
+}  
