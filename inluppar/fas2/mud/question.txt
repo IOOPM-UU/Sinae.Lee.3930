@@ -1,0 +1,13 @@
+Lego 101;Building lego is easy peasy;10
+Beräkningsvetenskap;Räkna 1,2,3;10
+Cocktail 101;The joy of mixology;10
+Cat 101;10 ways to make your cat happy;10
+IOOPM;How to stress yourself;20
+Dance 101;How to dance off your ass;10
+Arkitekt 101;Sand och betong;10
+Julkorvstoppning 101;Piggy Wiggy;10
+Riskinvestering 101;How to burn off your CSN in 10 days;10
+Konst 101;How to draw a perfect cube on your course literature;10
+Friluftsliv 101;Den snabbaste vägen från ångan till itc;20
+
+
