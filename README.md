@@ -1,4 +1,4 @@
-# [Ditt namn här]s repo
+# [Sinae Lee]s repo
 
 Den här filen är automatgenererad tillsammans med nedanstående
 mappstruktur:
