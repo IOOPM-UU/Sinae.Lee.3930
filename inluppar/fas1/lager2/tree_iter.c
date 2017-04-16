@@ -2,6 +2,9 @@
 #include<stdio.h>
 #include<stdlib.h>
 
+
+// mål: iteration vs recursion
+
 typedef struct node node_t;
 
 
